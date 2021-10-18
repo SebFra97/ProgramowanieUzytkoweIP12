@@ -8,9 +8,9 @@ namespace RepositoryPattern
     public interface IBookRepository : IDisposable
     {
         List<BookDto> GetAllBooks();
-        BookDto GetBookById(int id);
+        BookDto GetBookById(int Id);
         void CreateNewBook(Book newBook);
-        void DeleteBook();
+        void DeleteBook(int Id);
         void AddRateToBook(int Id, int rate);
     }
 }
