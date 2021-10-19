@@ -9,7 +9,7 @@ namespace RepositoryPattern
     {
         List<BookDto> GetAllBooks();
         BookDto GetBookById(int Id);
-        void CreateNewBook(Book newBook);
+        void CreateNewBook(BookDto newBook);
         void DeleteBook(int Id);
         void AddRateToBook(int Id, int rate);
     }

@@ -3,6 +3,7 @@ using Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace RepositoryPattern
 {
@@ -33,9 +34,25 @@ namespace RepositoryPattern
                 context.SaveChanges();
             }
         }
-        public void CreateNewBook(Book newBook)
+        public void CreateNewBook(BookDto newBook)
         {
-            context.Books.Add(newBook);
+            List<Author> bookAuthors = new List<Author>();
+
+            foreach(var author in newBook.Authors)
+            {
+                bookAuthors.Add(new Author
+                {
+                    FirstName = author.FirstName,
+                    SecondName = author.SecondName,
+                });
+            }
+
+            context.Books.Add(new Book
+            {
+                Title = newBook.Title,
+                Authors = bookAuthors,
+                ReleaseDate = newBook.ReleaseDate
+            });
             context.SaveChanges();
         }
         public void DeleteBook(int Id)
@@ -47,42 +64,56 @@ namespace RepositoryPattern
         }
         public List<BookDto> GetAllBooks()
         {
-            var listofBooks = context.Books.Include(x => x.Authors)
-                                           .Select(book => new BookDto
-                                           {
-                                               Id = book.Id,
-                                               Authors = GetAuthorsOfBook(book),
-                                               Title = book.Title,
-                                               RatesCount = CountBookRates(book),
-                                               ReleaseDate = book.ReleaseDate,
-                                               AverageRate = CountBookAverageRate(book.Rates)
-                                           })
+            List<BookDto> resultList = new List<BookDto>();
+            List<Book> tempBooks = context.Books.Include(x => x.Authors)
+                                                .Include(x => x.Rates)
                                            .ToList();
 
-            return listofBooks;
+            foreach(var book in tempBooks)
+            {
+                var authors = GetAuthorsOfBook(book);
+
+                resultList.Add(new BookDto
+                {
+                    Id = book.Id,
+                    Authors = authors.Result,
+                    Title = book.Title,
+                    RatesCount = CountBookRates(book),
+                    ReleaseDate = book.ReleaseDate,
+                    AverageRate = CountBookAverageRate(book.Rates),
+                    
+                });
+            }
+
+            return resultList;
         }
         public BookDto GetBookById(int Id)
         {
             List<AuthorDto> listOfAutors = new List<AuthorDto>();
             var foundBook = context.Books.Where(x => x.Id == Id).FirstOrDefault();
 
-            return new BookDto
+            if (foundBook != null)
             {
-                Id = Id,
-                Title = foundBook.Title,
-                ReleaseDate = foundBook.ReleaseDate,
-                RatesCount = CountBookRates(foundBook),
-                Authors = GetAuthorsOfBook(foundBook),
-                AverageRate = CountBookAverageRate(foundBook.Rates)
-            };
+                var authors = GetAuthorsOfBook(foundBook);
+                return new BookDto
+                {
+                    Id = Id,
+                    Title = foundBook.Title,
+                    ReleaseDate = foundBook.ReleaseDate,
+                    RatesCount = CountBookRates(foundBook),
+                    Authors = authors.Result,
+                    AverageRate = CountBookAverageRate(foundBook.Rates)
+                };
+            }
+            else return null;
         }
         public void Dispose() { }
 
         // private methods 
 
-        private List<AuthorVM> GetAuthorsOfBook(Book inputBook)
+        private async Task<List<AuthorVM>> GetAuthorsOfBook(Book inputBook)
         {
-            var authors = context.Authors
+            var authors = await context.Authors
                                               .Where(x => x.Books.Contains(inputBook))
                                               .Select(author => new AuthorVM
                                               {
@@ -90,31 +121,46 @@ namespace RepositoryPattern
                                                   FirstName = author.FirstName,
                                                   SecondName = author.SecondName
                                               })
-                                              .ToList();
+                                              .ToListAsync();
 
             return authors;
         }
-        private string CountBookAverageRate(List<BookRate> inputData)
+        private static string CountBookAverageRate(List<BookRate> inputData)
         {
-            short rateSummary = 0;
-            short rateCount = 0;
-
-            foreach (var rec in inputData)
+            if (inputData != null)
             {
-                if (rec.Type == RateType.BookRate)
-                {
-                    rateSummary += rec.Value;
-                    rateCount++;
-                }
-            }
+                short rateSummary = 0;
+                short rateCount = 0;
 
-            short rateAverage = (short)((rateSummary) / (rateCount));
-            return rateAverage.ToString();
+                foreach (var rec in inputData)
+                {
+                    if (rec.Type == RateType.BookRate)
+                    {
+                        rateSummary += rec.Value;
+                        rateCount++;
+                    }
+                }
+                short rateAverage;
+                if (rateCount > 0 && rateSummary > 0)
+                {
+                    rateAverage = (short)((rateSummary) / (rateCount));
+                }
+                else rateAverage = 0;
+
+                return rateAverage.ToString();
+            }
+            else return "";
+            
         }
-        private int CountBookRates(Book inputBook)
+        private static int CountBookRates(Book inputBook)
         {
-            int count = inputBook.Rates.Where(x => x.FkBook == inputBook.Id && x.Type == RateType.BookRate).Count();
-            return count;
+            if (inputBook.Rates != null)
+            {
+                int count = inputBook.Rates.Where(x => x.FkBook == inputBook.Id && x.Type == RateType.BookRate).Count();
+                return count;
+            }
+            else return 0;
+            
         }
     }
 }

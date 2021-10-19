@@ -26,6 +26,7 @@ namespace ProgramowanieUzytkoweIP12
             services.AddSwaggerGen();
 
             services.AddScoped<IBookRepository, BookRepository>();
+            services.AddScoped<IAuthorRepository, AuthorRepository>();
             services.AddDbContext<ApplicationDbContext>(options =>
                                                         options.UseNpgsql("Server=localhost;Port=5432;Database=PU_Database;User Id=sebfra;Password=zaq1@WSX;"));
         }

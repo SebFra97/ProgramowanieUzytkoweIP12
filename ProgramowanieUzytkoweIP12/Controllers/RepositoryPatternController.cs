@@ -28,13 +28,16 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         }
 
         [HttpGet("/book/get/{id}")]
-        public BookDto GetBook([FromRoute] int id)
+        public ActionResult<BookDto> GetBook([FromRoute] int id)
         {
-            return _bookRepository.GetBookById(id);
+            var book = _bookRepository.GetBookById(id);
+
+            if (book != null) return Ok(book);
+            else return NotFound();
         }
 
         [HttpPost("/book/create")]
-        public ActionResult<Book> CreateBook(Book book)
+        public ActionResult<Book> CreateBook(BookDto book)
         {
             try
             {
@@ -80,13 +83,13 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         #region AUTHOR ENDPOINTS
 
         [HttpGet("/authors/get")]
-        public List<BookDto> GetAuthor()
+        public List<AuthorDto> GetAuthor()
         {
-            return _bookRepository.GetAllBooks();
+            return _authorRepository.GetAllAuthors();
         }
 
         [HttpPost("/author/create")]
-        public ActionResult<Book> CreateAuthor(Author author)
+        public ActionResult<Author> CreateAuthor(AuthorDto author)
         {
             try
             {

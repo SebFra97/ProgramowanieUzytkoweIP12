@@ -8,7 +8,7 @@ namespace RepositoryPattern
     public interface IAuthorRepository : IDisposable
     {
         List<AuthorDto> GetAllAuthors();
-        void CreateNewAuthor(Author author);
+        void CreateNewAuthor(AuthorDto newAuthor);
         bool DeleteAuthor(int id);
         void AddRateToAuthor(int id, int rate);
     }
