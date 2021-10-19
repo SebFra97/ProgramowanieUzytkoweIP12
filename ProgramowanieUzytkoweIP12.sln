@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepositoryPattern", "Reposi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CQRS", "CQRS\CQRS.csproj", "{308930FA-F379-4D25-AC1E-F7A849176AA9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CQRSMediatR", "CQRSMediatR\CQRSMediatR.csproj", "{F1A6B8A6-3699-4E13-B8B5-AFA232B7EDD0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{308930FA-F379-4D25-AC1E-F7A849176AA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{308930FA-F379-4D25-AC1E-F7A849176AA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{308930FA-F379-4D25-AC1E-F7A849176AA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1A6B8A6-3699-4E13-B8B5-AFA232B7EDD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1A6B8A6-3699-4E13-B8B5-AFA232B7EDD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1A6B8A6-3699-4E13-B8B5-AFA232B7EDD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1A6B8A6-3699-4E13-B8B5-AFA232B7EDD0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

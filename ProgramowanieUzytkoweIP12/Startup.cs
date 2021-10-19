@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Model;
 using RepositoryPattern;
+using System;
 
 namespace ProgramowanieUzytkoweIP12
 {
@@ -23,12 +25,16 @@ namespace ProgramowanieUzytkoweIP12
         {
 
             services.AddControllers();
+            var assembly = AppDomain.CurrentDomain.Load("CQRSMediatR");
+            services.AddMediatR(assembly);
             services.AddSwaggerGen();
 
             services.AddScoped<IBookRepository, BookRepository>();
             services.AddScoped<IAuthorRepository, AuthorRepository>();
             services.AddDbContext<ApplicationDbContext>(options =>
                                                         options.UseNpgsql("Server=localhost;Port=5432;Database=PU_Database;User Id=sebfra;Password=zaq1@WSX;"));
+
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

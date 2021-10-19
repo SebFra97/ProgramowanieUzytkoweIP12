@@ -1,7 +1,7 @@
 ﻿using CQRS;
 using Microsoft.AspNetCore.Mvc;
 using Model;
-using RepositoryPattern;
+using Models.DTO;
 using System;
 using System.Collections.Generic;
 
@@ -28,13 +28,13 @@ namespace ProgramowanieUzytkoweIP12.Controllers
 
         #region BOOK ENDPOINTS
 
-        [HttpGet("/book/get")]
+        [HttpGet("/book/cqrs/get")]
         public List<BookDto> GetBooks()
         {
             return _bookQueryRepository.GetAllBooks();
         }
 
-        [HttpGet("/book/get/{id}")]
+        [HttpGet("/book/cqrs/get/{id}")]
         public ActionResult<BookDto> GetBook([FromRoute] int id)
         {
             var book = _bookQueryRepository.GetBookById(id);
@@ -43,7 +43,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
             else return NotFound();
         }
 
-        [HttpPost("/book/create")]
+        [HttpPost("/book/cqrs/create")]
         public ActionResult<Book> CreateBook(BookDto book)
         {
             try
@@ -57,7 +57,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
             }
         }
 
-        [HttpPost("/book/add/rate/{id}")]
+        [HttpPost("/book/cqrs/add/rate/{id}")]
         public ActionResult AddRateToBook([FromRoute] int id, int rate)
         {
             try
@@ -71,7 +71,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
             }
         }
 
-        [HttpDelete("/book/delete/{id}")]
+        [HttpDelete("/book/cqrs/delete/{id}")]
         public ActionResult DeleteBook([FromRoute] int id)
         {
             try
@@ -88,13 +88,13 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         #endregion
         #region AUTHOR ENDPOINTS
 
-        [HttpGet("/authors/get")]
+        [HttpGet("/authors/cqrs/get")]
         public List<AuthorDto> GetAuthor()
         {
             return _authorQueryRepository.GetAllAuthors();
         }
 
-        [HttpPost("/author/create")]
+        [HttpPost("/author/cqrs/create")]
         public ActionResult<Author> CreateAuthor(AuthorDto author)
         {
             try
@@ -107,7 +107,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
                 return BadRequest();
             }
         }
-        [HttpPost("/author/add/rate/{id}")]
+        [HttpPost("/author/cqrs/add/rate/{id}")]
         public ActionResult AddRateToAuthor([FromRoute] int id, int rate)
         {
             try
@@ -120,7 +120,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
                 return BadRequest();
             }
         }
-        [HttpDelete("/author/delete/{id}")]
+        [HttpDelete("/author/cqrs/delete/{id}")]
         public ActionResult DeleteAuthor([FromRoute] int id)
         {
             try

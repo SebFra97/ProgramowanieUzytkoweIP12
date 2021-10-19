@@ -1,4 +1,4 @@
-﻿using RepositoryPattern;
+﻿using Models.DTO;
 using System.Collections.Generic;
 
 namespace CQRS
