@@ -118,8 +118,9 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         {
             try
             {
-                _authorRepository.DeleteAuthor(id);
-                return Ok();
+                bool result = _authorRepository.DeleteAuthor(id);
+
+                return (result ? Ok() : BadRequest());
             }
             catch (Exception)
             {

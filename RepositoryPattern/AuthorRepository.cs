@@ -38,11 +38,18 @@ namespace RepositoryPattern
             context.Authors.Add(author);
             context.SaveChanges();
         }
-        public void DeleteAuthor(int id)
+        public bool DeleteAuthor(int id)
         {
             var authorToDelete = context.Authors.Where(x => x.Id == id).FirstOrDefault();
-            context.Authors.Remove(authorToDelete);
-            context.SaveChanges();
+
+            if (!authorToDelete.Books.Any())
+            {
+                context.Authors.Remove(authorToDelete);
+                context.SaveChanges();
+                return true;
+            }
+
+            return false;
         }
         public List<AuthorDto> GetAllAuthors()
         {
