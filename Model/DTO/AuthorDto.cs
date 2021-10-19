@@ -1,7 +1,7 @@
 ﻿using Model;
 using System.Collections.Generic;
 
-namespace RepositoryPattern
+namespace Models.DTO
 {
     public class AuthorDto
     {

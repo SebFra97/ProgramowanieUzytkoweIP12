@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Model;
-using RepositoryPattern;
+using Models.DTO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

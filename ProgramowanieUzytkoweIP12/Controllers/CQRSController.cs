@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CQRS;
+using Microsoft.AspNetCore.Mvc;
 using Model;
 using RepositoryPattern;
 using System;
@@ -8,29 +9,35 @@ namespace ProgramowanieUzytkoweIP12.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RepositoryPatternController : ControllerBase
+    public class CQRSController : ControllerBase
     {
-        private IBookRepository _bookRepository;
-        private IAuthorRepository _authorRepository;
+        private IAuthorQueryRepository _authorQueryRepository;
+        private IAuthorCommandRepository _authorCommandRepository;
 
-        public RepositoryPatternController(IBookRepository bookRepository, IAuthorRepository authorRepository)
+        private IBookQueryRepository _bookQueryRepository;
+        private IBookCommandRepository _bookCommandRepository;
+
+        public CQRSController(IAuthorQueryRepository authorQueryRepository, IAuthorCommandRepository authorCommandRepository, IBookQueryRepository bookQueryRepository, IBookCommandRepository bookCommandRepository)
         {
-            _bookRepository = bookRepository;
-            _authorRepository = authorRepository;
+            _authorQueryRepository = authorQueryRepository;
+            _authorCommandRepository = authorCommandRepository;
+            _bookQueryRepository = bookQueryRepository;
+            _bookCommandRepository = bookCommandRepository;
         }
+
 
         #region BOOK ENDPOINTS
 
         [HttpGet("/book/get")]
         public List<BookDto> GetBooks()
         {
-            return _bookRepository.GetAllBooks();
+            return _bookQueryRepository.GetAllBooks();
         }
 
         [HttpGet("/book/get/{id}")]
         public ActionResult<BookDto> GetBook([FromRoute] int id)
         {
-            var book = _bookRepository.GetBookById(id);
+            var book = _bookQueryRepository.GetBookById(id);
 
             if (book != null) return Ok(book);
             else return NotFound();
@@ -41,7 +48,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         {
             try
             {
-                _bookRepository.CreateNewBook(book);
+                _bookCommandRepository.CreateNewBook(book);
                 return Ok(book);
             }
             catch (Exception)
@@ -55,7 +62,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         {
             try
             {
-                _bookRepository.AddRateToBook(id, rate);
+                _bookCommandRepository.AddRateToBook(id, rate);
                 return Ok();
             }
             catch (Exception)
@@ -69,7 +76,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         {
             try
             {
-                _bookRepository.DeleteBook(id);
+                _bookCommandRepository.DeleteBook(id);
                 return Ok();
             }
             catch (Exception)
@@ -84,7 +91,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         [HttpGet("/authors/get")]
         public List<AuthorDto> GetAuthor()
         {
-            return _authorRepository.GetAllAuthors();
+            return _authorQueryRepository.GetAllAuthors();
         }
 
         [HttpPost("/author/create")]
@@ -92,7 +99,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         {
             try
             {
-                _authorRepository.CreateNewAuthor(author);
+                _authorCommandRepository.CreateNewAuthor(author);
                 return Ok(author);
             }
             catch (Exception)
@@ -100,13 +107,12 @@ namespace ProgramowanieUzytkoweIP12.Controllers
                 return BadRequest();
             }
         }
-
         [HttpPost("/author/add/rate/{id}")]
         public ActionResult AddRateToAuthor([FromRoute] int id, int rate)
         {
             try
             {
-                _authorRepository.AddRateToAuthor(id, rate);
+                _authorCommandRepository.AddRateToAuthor(id, rate);
                 return Ok();
             }
             catch (Exception)
@@ -114,13 +120,12 @@ namespace ProgramowanieUzytkoweIP12.Controllers
                 return BadRequest();
             }
         }
-
         [HttpDelete("/author/delete/{id}")]
         public ActionResult DeleteAuthor([FromRoute] int id)
         {
             try
             {
-                bool result = _authorRepository.DeleteAuthor(id);
+                bool result = _authorCommandRepository.DeleteAuthor(id);
 
                 return (result ? Ok() : BadRequest());
             }
@@ -131,6 +136,5 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         }
 
         #endregion
-
     }
 }

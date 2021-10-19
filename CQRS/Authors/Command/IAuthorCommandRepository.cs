@@ -1,4 +1,4 @@
-﻿using RepositoryPattern;
+﻿using Models.DTO;
 
 namespace CQRS
 {
