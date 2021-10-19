@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace CQRSMediatR.Authors.Command
 {
-    public class CreateNewAuthorCommand : IRequest<Author>
+    public class CreateAuthorCommand : IRequest<Author>
     {
         public AuthorDto newAuthor { get; set; }
 
-        public class CreateNewAuthorCommandHandler : IRequestHandler<CreateNewAuthorCommand, Author>
+        public class CreateNewAuthorCommandHandler : IRequestHandler<CreateAuthorCommand, Author>
         {
             private ApplicationDbContext context;
 
@@ -19,7 +19,7 @@ namespace CQRSMediatR.Authors.Command
                 this.context = context;
             }
 
-            public Task<Author> Handle(CreateNewAuthorCommand request, CancellationToken cancellationToken)
+            public Task<Author> Handle(CreateAuthorCommand request, CancellationToken cancellationToken)
             {
                 var newAuthor = new Author
                 {

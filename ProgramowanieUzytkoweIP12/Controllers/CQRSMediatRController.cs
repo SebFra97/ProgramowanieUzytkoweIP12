@@ -97,7 +97,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         {
             try
             {
-                _mediator.Send(new CreateNewAuthorCommand() { newAuthor = author });
+                _mediator.Send(new CreateAuthorCommand() { newAuthor = author });
                 return Ok(author);
             }
             catch (Exception)
