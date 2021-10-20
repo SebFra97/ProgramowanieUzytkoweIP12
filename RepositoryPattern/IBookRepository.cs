@@ -1,12 +1,9 @@
-﻿using Model;
-using Models.DTO;
-using System;
+﻿using Models.DTO;
 using System.Collections.Generic;
-using System.Text;
 
 namespace RepositoryPattern
 {
-    public interface IBookRepository : IDisposable
+    public interface IBookRepository
     {
         List<BookDto> GetAllBooks();
         BookDto GetBookById(int Id);
