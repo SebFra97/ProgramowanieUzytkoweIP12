@@ -1,3 +1,5 @@
+using CQRS;
+using CQRS.Books.Command;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +10,9 @@ using Microsoft.Extensions.Hosting;
 using Model;
 using RepositoryPattern;
 using System;
+using static CQRS.Books.Command.AddBookCommand;
+using static CQRS.Books.Command.AddRateToBookCommand;
+using static CQRS.Books.Command.DeleteBookCommand;
 
 namespace ProgramowanieUzytkoweIP12
 {
@@ -29,8 +34,15 @@ namespace ProgramowanieUzytkoweIP12
             services.AddMediatR(assembly);
             services.AddSwaggerGen();
 
+            services.AddScoped<CommandBus>();
             services.AddScoped<IBookRepository, BookRepository>();
             services.AddScoped<IAuthorRepository, AuthorRepository>();
+
+            services.AddScoped<ICommandHandler<AddBookCommand>, AddBookCommandHandler>();
+            services.AddScoped<ICommandHandler<AddRateToBookCommand>, AddRateToBookCommandHandler>();
+            services.AddScoped<ICommandHandler<DeleteBookCommand>, DeleteBookCommandHandler>();
+
+
             services.AddDbContext<ApplicationDbContext>(options =>
                                                         options.UseNpgsql("Server=localhost;Port=5432;Database=PU_Database;User Id=sebfra;Password=zaq1@WSX;"));
 

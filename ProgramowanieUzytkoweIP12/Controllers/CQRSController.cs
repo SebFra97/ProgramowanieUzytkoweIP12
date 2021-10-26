@@ -17,6 +17,8 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         private IBookQueryRepository _bookQueryRepository;
         private IBookCommandRepository _bookCommandRepository;
 
+        private readonly CommandBus commandBus;
+
         public CQRSController(IAuthorQueryRepository authorQueryRepository, IAuthorCommandRepository authorCommandRepository, IBookQueryRepository bookQueryRepository, IBookCommandRepository bookCommandRepository)
         {
             _authorQueryRepository = authorQueryRepository;
