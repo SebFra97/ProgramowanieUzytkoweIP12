@@ -1,5 +1,8 @@
 using CQRS;
+using CQRS.Authors.Command;
+using CQRS.Authors.Query;
 using CQRS.Books.Command;
+using CQRS.Books.Query;
 using Helpers;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -9,11 +12,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Model;
+using Models.DTO;
 using RepositoryPattern;
 using System;
+using System.Collections.Generic;
+using static CQRS.Authors.Command.AddRateToAuthorCommand;
+using static CQRS.Authors.Command.CreateAuthorCommand;
+using static CQRS.Authors.Command.DeleteAuthorCommand;
+using static CQRS.Authors.Query.GetAllAuthorsQuery;
 using static CQRS.Books.Command.AddBookCommand;
 using static CQRS.Books.Command.AddRateToBookCommand;
 using static CQRS.Books.Command.DeleteBookCommand;
+using static CQRS.Books.Query.GetAllBooksQuery;
+using static CQRS.Books.Query.GetBookQuery;
 
 namespace ProgramowanieUzytkoweIP12
 {
@@ -36,13 +47,23 @@ namespace ProgramowanieUzytkoweIP12
             services.AddSwaggerGen();
 
             services.AddScoped<CommandBus>();
+            services.AddScoped<QueryBus>();
+
             services.AddScoped<IBookRepository, BookRepository>();
             services.AddScoped<IAuthorRepository, AuthorRepository>();
             services.AddScoped<IBookHelpers,BookHelpers>();
+            services.AddScoped<IAuthorHelpers, AuthorHelpers>();
+
             services.AddScoped<ICommandHandler<AddBookCommand>, AddBookCommandHandler>();
             services.AddScoped<ICommandHandler<AddRateToBookCommand>, AddRateToBookCommandHandler>();
             services.AddScoped<ICommandHandler<DeleteBookCommand>, DeleteBookCommandHandler>();
+            services.AddScoped<IQueryHandler<GetAllBooksQuery, List<BookDto>>, GetAllBooksQueryHandler>();
+            services.AddScoped<IQueryHandler<GetBookQuery, BookDto>, GetBookQueryHandler>();
 
+            services.AddScoped<ICommandHandler<AddRateToAuthorCommand>, AddRateToAuthorCommandHandler>();
+            services.AddScoped<ICommandHandler<CreateAuthorCommand>, CreateNewAuthorCommandHandler>();
+            services.AddScoped<ICommandHandler<DeleteAuthorCommand>, DeleteAuthorCommandHandler>();
+            services.AddScoped<IQueryHandler<GetAllAuthorsQuery, List<AuthorDto>>, GetAllAuthorsQueryHandler>();
 
             services.AddDbContext<ApplicationDbContext>(options =>
                                                         options.UseNpgsql("Server=localhost;Port=5432;Database=PU_Database;User Id=sebfra;Password=zaq1@WSX;"));
