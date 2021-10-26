@@ -2,69 +2,22 @@
 using Microsoft.EntityFrameworkCore;
 using Model;
 using Models.DTO;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RepositoryPattern
+namespace CQRS
 {
-    public class BookRepository : IBookRepository
+    public class BookQueryRepository : IBookQueryRepository
     {
         private ApplicationDbContext context;
         private IBookHelpers _bookHelpers;
 
-        public BookRepository(ApplicationDbContext context, IBookHelpers bookHelpers)
+        public BookQueryRepository(ApplicationDbContext context, IBookHelpers bookHelpers)
         {
             this.context = context;
             _bookHelpers = bookHelpers;
         }
 
-        public void AddRateToBook(int Id, int rate)
-        {
-            var book = context.Books.Where(x => x.Id == Id).FirstOrDefault();
-
-            if (book != null)
-            {
-                context.BookRate.Add(new BookRate
-                {
-                    Type = RateType.BookRate,
-                    Book = book,
-                    FkBook = book.Id,
-                    Date = DateTime.Now,
-                    Value = (short)rate
-                });
-
-                context.SaveChanges();
-            }
-        }
-        public void CreateNewBook(BookDto newBook)
-        {
-            List<Author> bookAuthors = new List<Author>();
-
-            foreach (var author in newBook.Authors)
-            {
-                bookAuthors.Add(new Author
-                {
-                    FirstName = author.FirstName,
-                    SecondName = author.SecondName,
-                });
-            }
-
-            context.Books.Add(new Book
-            {
-                Title = newBook.Title,
-                Authors = bookAuthors,
-                ReleaseDate = newBook.ReleaseDate
-            });
-            context.SaveChanges();
-        }
-        public void DeleteBook(int Id)
-        {
-            var bookToDelete = context.Books.Where(x => x.Id == Id).FirstOrDefault();
-
-            context.Books.Remove(bookToDelete);
-            context.SaveChanges();
-        }
         public List<BookDto> GetAllBooks()
         {
             List<BookDto> resultList = new List<BookDto>();

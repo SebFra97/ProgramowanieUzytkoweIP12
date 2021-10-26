@@ -1,12 +1,9 @@
-﻿using Model;
-using Models.DTO;
-using System;
+﻿using Models.DTO;
 using System.Collections.Generic;
-using System.Text;
 
 namespace RepositoryPattern
 {
-    public interface IAuthorRepository : IDisposable
+    public interface IAuthorRepository
     {
         List<AuthorDto> GetAllAuthors();
         void CreateNewAuthor(AuthorDto newAuthor);

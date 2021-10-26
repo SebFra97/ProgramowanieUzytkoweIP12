@@ -13,7 +13,6 @@ namespace CQRS.Authors.Query
         public class GetAllAuthorsQueryHandler : IQueryHandler<GetAllAuthorsQuery, List<AuthorDto>>
         {
             private ApplicationDbContext context;
-            private 
 
             public GetAllAuthorsQueryHandler(ApplicationDbContext context)
             {

@@ -1,5 +1,4 @@
-using CQRS;
-using CQRS.Books.Command;
+using Helpers;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,7 +36,7 @@ namespace ProgramowanieUzytkoweIP12
             services.AddScoped<CommandBus>();
             services.AddScoped<IBookRepository, BookRepository>();
             services.AddScoped<IAuthorRepository, AuthorRepository>();
-
+            services.AddScoped<IBookHelpers,BookHelpers>();
             services.AddScoped<ICommandHandler<AddBookCommand>, AddBookCommandHandler>();
             services.AddScoped<ICommandHandler<AddRateToBookCommand>, AddRateToBookCommandHandler>();
             services.AddScoped<ICommandHandler<DeleteBookCommand>, DeleteBookCommandHandler>();
