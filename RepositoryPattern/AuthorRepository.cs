@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Helpers;
+using Microsoft.EntityFrameworkCore;
 using Model;
 using Models.DTO;
 using System;
@@ -10,6 +11,7 @@ namespace RepositoryPattern
     public class AuthorRepository : IAuthorRepository
     {
         private ApplicationDbContext context;
+        private IAuthorHelpers _authorHelpers;
 
         public AuthorRepository(ApplicationDbContext context)
         {
@@ -66,13 +68,13 @@ namespace RepositoryPattern
 
             foreach (var author in tempAuthors)
             {
-                var books = GetBooksOfAuthor(author);
+                var books = _authorHelpers.GetBooksOfAuthor(author);
 
                 resultList.Add(new AuthorDto
                 {
                     Id = author.Id,
-                    AverageRate = CountAuthorRateAverage(author.Rates),
-                    RatesCount = CountAuthorRates(author),
+                    AverageRate = _authorHelpers.CountAuthorRateAverage(author.Rates),
+                    RatesCount = _authorHelpers.CountAuthorRates(author),
                     Books = books.Result,
                     FirstName = author.FirstName,
                     SecondName = author.SecondName
