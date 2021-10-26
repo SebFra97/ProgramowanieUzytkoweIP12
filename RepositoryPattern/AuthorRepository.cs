@@ -13,9 +13,10 @@ namespace RepositoryPattern
         private ApplicationDbContext context;
         private IAuthorHelpers _authorHelpers;
 
-        public AuthorRepository(ApplicationDbContext context)
+        public AuthorRepository(ApplicationDbContext context, IAuthorHelpers authorHelpers)
         {
             this.context = context;
+            _authorHelpers = authorHelpers;
         }
 
         public void AddRateToAuthor(int id, int rate)
