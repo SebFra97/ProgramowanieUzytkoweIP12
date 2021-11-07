@@ -12,6 +12,9 @@ namespace CQRSMediatR.Authors.Query
 {
     public class GetAllAuthorsQuery : IRequest<List<AuthorDto>>
     {
+        public int page { get; set; }
+        public int count { get; set; }
+
         public class GetAllAuthorsQueryHandler : IRequestHandler<GetAllAuthorsQuery, List<AuthorDto>>
         {
             private ApplicationDbContext context;
@@ -28,6 +31,8 @@ namespace CQRSMediatR.Authors.Query
                 List<AuthorDto> resultList = new List<AuthorDto>();
                 var tempAuthors = context.Authors.Include(x => x.Books)
                                                .Include(x => x.Rates)
+                                               .Skip(request.page * request.count)
+                                               .Take(request.count)
                                                .ToList();
 
 

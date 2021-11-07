@@ -65,11 +65,13 @@ namespace RepositoryPattern
             context.Books.Remove(bookToDelete);
             context.SaveChanges();
         }
-        public List<BookDto> GetAllBooks()
+        public List<BookDto> GetAllBooks(PaginationDto pagination)
         {
             List<BookDto> resultList = new List<BookDto>();
             List<Book> tempBooks = context.Books.Include(x => x.Authors)
                                                 .Include(x => x.Rates)
+                                                .Skip(pagination.Page * pagination.Count)
+                                                .Take(pagination.Count)
                                            .ToList();
 
             foreach (var book in tempBooks)

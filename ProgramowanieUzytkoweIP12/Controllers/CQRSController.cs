@@ -1,4 +1,8 @@
 ﻿using CQRS;
+using CQRS.Authors.Command;
+using CQRS.Authors.Query;
+using CQRS.Books.Command;
+using CQRS.Books.Query;
 using Microsoft.AspNetCore.Mvc;
 using Model;
 using Models.DTO;
@@ -9,73 +13,73 @@ namespace ProgramowanieUzytkoweIP12.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CQRSController : ControllerBase { 
+    public class CQRSController : ControllerBase 
+    { 
     
-
         private readonly CommandBus commandBus;
+        private readonly QueryBus queryBus;
 
-        public CQRSController(CommandBus commandBus)
+        public CQRSController(CommandBus commandBus, QueryBus queryBus)
         {
             this.commandBus = commandBus;
+            this.queryBus = queryBus;
         }
-
-
 
         #region BOOK ENDPOINTS
 
         [HttpGet("/book/cqrs/get")]
-        public List<BookDto> GetBooks()
+        public List<BookDto> GetBooks([FromQuery] GetAllBooksQuery query)
         {
-            return null;
+            return queryBus.Handle<GetAllBooksQuery, List<BookDto>>(query);
         }
 
         [HttpGet("/book/cqrs/get/{id}")]
-        public ActionResult<BookDto> GetBook([FromRoute] int id)
+        public ActionResult<BookDto> GetBook([FromQuery] GetBookQuery query)
         {
-            return null;
+            return queryBus.Handle<GetBookQuery, BookDto>(query);
         }
 
         [HttpPost("/book/cqrs/create")]
-        public ActionResult<Book> CreateBook(BookDto book)
+        public void CreateBook([FromBody] AddBookCommand command)
         {
-            return null;
+            commandBus.Handle(command);
         }
 
         [HttpPost("/book/cqrs/add/rate/{id}")]
-        public ActionResult AddRateToBook([FromRoute] int id, int rate)
+        public void AddRateToBook([FromBody] AddRateToBookCommand command)
         {
-            return null;
+            commandBus.Handle(command);
         }
 
         [HttpDelete("/book/cqrs/delete/{id}")]
-        public ActionResult DeleteBook([FromRoute] int id)
+        public void DeleteBook([FromBody] DeleteBookCommand command)
         {
-            return null; 
+            commandBus.Handle(command);
         }
 
         #endregion
         #region AUTHOR ENDPOINTS
 
         [HttpGet("/authors/cqrs/get")]
-        public List<AuthorDto> GetAuthor()
+        public List<AuthorDto> GetAuthors([FromQuery] GetAllAuthorsQuery query)
         {
-            return null;
+            return queryBus.Handle<GetAllAuthorsQuery, List<AuthorDto>>(query);
         }
 
         [HttpPost("/author/cqrs/create")]
-        public ActionResult<Author> CreateAuthor(AuthorDto author)
+        public void CreateAuthor([FromBody] CreateAuthorCommand command)
         {
-            return null;
+            commandBus.Handle(command);
         }
         [HttpPost("/author/cqrs/add/rate/{id}")]
-        public ActionResult AddRateToAuthor([FromRoute] int id, int rate)
+        public void AddRateToAuthor([FromBody] AddRateToAuthorCommand command)
         {
-            return null;
+            commandBus.Handle(command);
         }
         [HttpDelete("/author/cqrs/delete/{id}")]
-        public ActionResult DeleteAuthor([FromRoute] int id)
+        public void DeleteAuthor([FromBody] DeleteBookCommand command)
         {
-            return null;
+            commandBus.Handle(command);
         }
 
         #endregion

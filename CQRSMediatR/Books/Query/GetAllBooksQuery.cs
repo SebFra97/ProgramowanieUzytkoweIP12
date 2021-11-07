@@ -12,6 +12,9 @@ namespace CQRSMediatR.Books.Query
 {
     public class GetAllBooksQuery : IRequest<List<BookDto>>
     {
+        public int page { get; set; }
+        public int count { get; set; }
+
         public class GetAllBooksQueryHandler : IRequestHandler<GetAllBooksQuery, List<BookDto>>
         {
             private ApplicationDbContext context;
@@ -28,6 +31,8 @@ namespace CQRSMediatR.Books.Query
                 List<BookDto> resultList = new List<BookDto>();
                 List<Book> tempBooks = context.Books.Include(x => x.Authors)
                                                     .Include(x => x.Rates)
+                                                    .Skip(request.page * request.count)
+                                                    .Take(request.count)
                                                     .ToList();
 
                 foreach (var book in tempBooks)

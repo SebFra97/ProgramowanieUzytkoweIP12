@@ -23,9 +23,9 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         #region BOOK ENDPOINTS
 
         [HttpGet("/book/get")]
-        public List<BookDto> GetBooks()
+        public List<BookDto> GetBooks([FromQuery] PaginationDto pagination)
         {
-            return _bookRepository.GetAllBooks();
+            return _bookRepository.GetAllBooks(pagination);
         }
 
         [HttpGet("/book/get/{id}")]
@@ -83,9 +83,9 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         #region AUTHOR ENDPOINTS
 
         [HttpGet("/authors/get")]
-        public List<AuthorDto> GetAuthor()
+        public List<AuthorDto> GetAuthor([FromQuery] PaginationDto pagination)
         {
-            return _authorRepository.GetAllAuthors();
+            return _authorRepository.GetAllAuthors(pagination);
         }
 
         [HttpPost("/author/create")]

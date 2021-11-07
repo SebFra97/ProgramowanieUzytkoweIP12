@@ -59,11 +59,13 @@ namespace RepositoryPattern
 
             return false;
         }
-        public List<AuthorDto> GetAllAuthors()
+        public List<AuthorDto> GetAllAuthors(PaginationDto pagination)
         {
             List<AuthorDto> resultList = new List<AuthorDto>();
             var tempAuthors = context.Authors.Include(x => x.Books)
                                            .Include(x => x.Rates)
+                                           .Skip(pagination.Page * pagination.Count)
+                                           .Take(pagination.Count)
                                            .ToList();
 
 
