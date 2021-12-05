@@ -1,5 +1,6 @@
 ﻿using Model;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Models.DTO
 {
@@ -11,6 +12,8 @@ namespace Models.DTO
         public string AverageRate { get; set; }
         public int RatesCount { get; set; }
         public List<BookVM> Books { get; set; }
+        [StringLength(1000)]
+        public string CV { get; set; }
     }
 
     public class BookVM

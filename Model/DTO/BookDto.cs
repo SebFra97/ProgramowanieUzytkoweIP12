@@ -1,6 +1,7 @@
 ﻿using Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Models.DTO
 {
@@ -11,6 +12,8 @@ namespace Models.DTO
         public DateTime ReleaseDate { get; set; }
         public string AverageRate { get; set; }
         public int RatesCount { get; set; }
+        [StringLength(1000)]
+        public string Description { get; set; }
         public List<AuthorVM> Authors { get; set; }
     }
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Model
 {
@@ -9,5 +10,8 @@ namespace Model
         public string SecondName { get; set; }
         public List<Book> Books { get; set; }
         public List<AuthorRate> Rates { get; set; }
+
+        [StringLength(1000)]
+        public string CV { get; set; }
     }
 }

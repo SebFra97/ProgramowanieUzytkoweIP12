@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Model
 {
@@ -10,5 +11,8 @@ namespace Model
         public DateTime ReleaseDate { get; set; }
         public List<Author> Authors { get; set; }
         public List<BookRate> Rates { get; set; }
+
+        [StringLength(1000)]
+        public string Description { get; set; }
     }
 }
