@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Model;
 using Models.DTO;
+using Nest;
 using RepositoryPattern;
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,7 @@ namespace ProgramowanieUzytkoweIP12
         {
 
             services.AddControllers();
+            services.AddScoped<IElasticClient>(x => new ElasticClient(new ConnectionSettings(new Uri("http://localhost:9200"))));
             var assembly = AppDomain.CurrentDomain.Load("CQRSMediatR");
             services.AddMediatR(assembly);
             services.AddSwaggerGen();
@@ -66,7 +68,7 @@ namespace ProgramowanieUzytkoweIP12
             services.AddScoped<IQueryHandler<GetAllAuthorsQuery, List<AuthorDto>>, GetAllAuthorsQueryHandler>();
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                                                        options.UseNpgsql("Server=localhost;Port=5432;Database=PU_Database;User Id=sebfra;Password=zaq1@WSX;"));
+                                                        options.UseNpgsql("Server=localhost;Port=5432;Database=PU_Database;User Id=postgres;Password=sebfra1;"));
 
             
         }

@@ -6,6 +6,7 @@ using CQRS.Books.Query;
 using Microsoft.AspNetCore.Mvc;
 using Model;
 using Models.DTO;
+using Nest;
 using System;
 using System.Collections.Generic;
 
@@ -18,12 +19,32 @@ namespace ProgramowanieUzytkoweIP12.Controllers
     
         private readonly CommandBus commandBus;
         private readonly QueryBus queryBus;
+        private readonly IElasticClient ElasticClient;
 
-        public CQRSController(CommandBus commandBus, QueryBus queryBus)
+        public CQRSController(CommandBus commandBus, QueryBus queryBus, IElasticClient elasticClient)
         {
             this.commandBus = commandBus;
             this.queryBus = queryBus;
+            ElasticClient = elasticClient;
         }
+
+        public class ElasticModel
+        {
+            public string Currency { get; set; }
+            public string Customer_first_name{ get; set; }
+            public string Customer_full_name{ get; set; }
+            public string Customer_gender{ get; set; }
+            public int Customer_id{ get; set; }
+        }
+
+
+        public IEnumerable<ElasticModel> GetElastic()
+        {
+            return ElasticClient.Search<ElasticModel>(x => x.Index("kibana_sample_data_ecommerce").Query(q => q.Match(q => q.Field(f => f.Customer_first_name).Query("Eddie")))).Documents;
+
+        }
+
+
 
         #region BOOK ENDPOINTS
 
