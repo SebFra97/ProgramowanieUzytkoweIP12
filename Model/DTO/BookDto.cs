@@ -23,13 +23,11 @@ namespace Models.DTO
         [JsonPropertyName("Description")]
         public string Description { get; set; }
        // [JsonPropertyName("authors")]
-       [JsonIgnore]
         public List<AuthorVM> Authors { get; set; }
     }
 
     public class AuthorVM
     {
-        [System.Text.Json.Serialization.JsonIgnore]
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string SecondName { get; set; }

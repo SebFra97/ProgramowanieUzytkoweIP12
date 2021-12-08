@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Model
 {
@@ -22,5 +23,8 @@ namespace Model
                         .HasValue<AuthorRate>(RateType.AuthorRate)
                         .HasValue<BookRate>(RateType.BookRate);
         }
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder options)
+        //    => options.UseSqlite($"Data Source={Environment.CurrentDirectory}\\database.db");
     }
 }

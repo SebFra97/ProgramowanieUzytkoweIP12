@@ -19,9 +19,9 @@ namespace Models.DTO
         public string AverageRate { get; set; }
         [JsonPropertyName("ratescount")]
         public int RatesCount { get; set; }
-        [JsonPropertyName("id")]
+        //[JsonPropertyName("id")]
         public List<BookVM> Books { get; set; }
-        [JsonPropertyName("id")]
+        [JsonPropertyName("cv")]
         [StringLength(1000)]
         public string CV { get; set; }
     }

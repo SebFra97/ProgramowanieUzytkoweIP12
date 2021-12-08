@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Model;
 using Models.DTO;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +13,9 @@ namespace CQRSMediatR.Books.Query
 {
     public class GetAllBooksQuery : IRequest<List<BookDto>>
     {
+        [Required]
         public int page { get; set; }
+        [Required]
         public int count { get; set; }
 
         public class GetAllBooksQueryHandler : IRequestHandler<GetAllBooksQuery, List<BookDto>>

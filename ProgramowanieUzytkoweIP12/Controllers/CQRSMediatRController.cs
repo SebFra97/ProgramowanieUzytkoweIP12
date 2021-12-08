@@ -26,17 +26,21 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         #region BOOKS REGION
 
         [HttpGet("/book/mediator/get")]
-        public Task<List<BookDto>> GetBooks()
+        public ActionResult<List<BookDto>> GetBooks([FromQuery] GetAllBooksQuery query)
         {
-            return _mediator.Send(new GetAllBooksQuery());
+            var books = _mediator.Send(query);
+
+            if (books.Result != null) return Ok(books.Result);
+            else return BadRequest();
+
         }
 
         [HttpGet("/book/mediator/get/{id}")]
-        public ActionResult<BookDto> GetBook([FromRoute] int id)
+        public ActionResult<BookDto> GetBook([FromQuery] GetBookQuery query)
         {
-            var book = _mediator.Send(new GetBookQuery() { id = id });
+            var book = _mediator.Send(query);
 
-            if (book != null) return Ok();
+            if (book != null) return Ok(book);
             else return BadRequest();
         }
 
@@ -87,9 +91,11 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         #region AUTHOR REGION
 
         [HttpGet("/authors/mediator/get")]
-        public Task<List<AuthorDto>> GetAuthorsMediator()
+        public ActionResult<List<AuthorDto>> GetAuthorsMediator([FromQuery] GetAllAuthorsQuery query)
         {
-            return _mediator.Send(new GetAllAuthorsQuery());
+            var authors = _mediator.Send(query);
+            if (authors.Result != null) return Ok(authors.Result);
+            else return BadRequest();
         }
 
         [HttpPost("/author/mediator/create")]

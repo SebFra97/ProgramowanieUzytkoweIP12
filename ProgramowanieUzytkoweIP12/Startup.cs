@@ -70,10 +70,10 @@ namespace ProgramowanieUzytkoweIP12
             services.AddScoped<ICommandHandler<DeleteAuthorCommand>, DeleteAuthorCommandHandler>();
             services.AddScoped<IQueryHandler<GetAllAuthorsQuery, List<AuthorDto>>, GetAllAuthorsQueryHandler>();
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                                                        options.UseNpgsql("Server=localhost;Port=5432;Database=PU_Database;User Id=postgres;Password=sebfra1;"));
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            // options.UseNpgsql("Server=localhost;Port=5432;Database=PU_Database;User Id=postgres;Password=sebfra1;"));
 
-            
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite($"Data Source={Environment.CurrentDirectory}\\database.db"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
