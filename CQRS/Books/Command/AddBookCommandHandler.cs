@@ -27,6 +27,7 @@ namespace CQRS.Books.Command
                     {
                         FirstName = author.FirstName,
                         SecondName = author.SecondName,
+                        CV = author.CV
                     });
                 }
 

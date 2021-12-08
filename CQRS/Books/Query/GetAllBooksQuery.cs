@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Model;
 using Models.DTO;
+using Nest;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,11 +17,13 @@ namespace CQRS.Books.Query
         {
             private ApplicationDbContext context;
             private IBookHelpers _bookHelpers;
+            private readonly IElasticClient _elasticClient;
 
-            public GetAllBooksQueryHandler(ApplicationDbContext context, IBookHelpers bookHelpers)
+            public GetAllBooksQueryHandler(ApplicationDbContext context, IBookHelpers bookHelpers, IElasticClient elasticClient)
             {
                 this.context = context;
                 _bookHelpers = bookHelpers;
+                _elasticClient = elasticClient;
             }
 
             List<BookDto> IQueryHandler<GetAllBooksQuery, List<BookDto>>.Handle(GetAllBooksQuery query)
@@ -46,6 +49,13 @@ namespace CQRS.Books.Query
                         AverageRate = _bookHelpers.CountBookAverageRate(book.Rates),
 
                     });
+
+                   
+                }
+
+                foreach(var result in resultList)
+                {
+                    IndexResponse res = _elasticClient.IndexDocument<BookDto>(result);
                 }
 
                 return resultList;

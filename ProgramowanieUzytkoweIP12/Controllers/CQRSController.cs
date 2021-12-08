@@ -19,13 +19,13 @@ namespace ProgramowanieUzytkoweIP12.Controllers
     
         private readonly CommandBus commandBus;
         private readonly QueryBus queryBus;
-        private readonly IElasticClient ElasticClient;
+        private readonly IElasticClient _elasticClient;
 
         public CQRSController(CommandBus commandBus, QueryBus queryBus, IElasticClient elasticClient)
         {
             this.commandBus = commandBus;
             this.queryBus = queryBus;
-            ElasticClient = elasticClient;
+            _elasticClient = elasticClient;
         }
 
         public class ElasticModel
@@ -37,10 +37,22 @@ namespace ProgramowanieUzytkoweIP12.Controllers
             public int Customer_id{ get; set; }
         }
 
-
-        public IEnumerable<ElasticModel> GetElastic()
+        [HttpGet("/book/cqrs/es/get")]
+        public IEnumerable<BookDto> GetElasticBooks([FromQuery] PaginationDto pagination, [FromQuery] string filter)
         {
-            return ElasticClient.Search<ElasticModel>(x => x.Index("kibana_sample_data_ecommerce").Query(q => q.Match(q => q.Field(f => f.Customer_first_name).Query("Eddie")))).Documents;
+            //return ElasticClient.Search<ElasticModel>(x => x.Index("kibana_sample_data_ecommerce").Query(q => q.Match(q => q.Field(f => f.Customer_first_name).Query("Eddie")))).Documents;
+            //IndexResponse res = _elasticClient.IndexDocument<BookDto>(person);
+
+
+            var x = _elasticClient.Search<BookDto>(x => x.Size(10).Skip(0)
+            .Query(q => q
+                .QueryString(qs =>
+                    qs.Fields(x => x
+                        .Field(f => f.Title)
+                        .Field(f => f.Description))
+                        .Query("*" + filter + "*")))).Documents;
+
+            return x;
 
         }
 
