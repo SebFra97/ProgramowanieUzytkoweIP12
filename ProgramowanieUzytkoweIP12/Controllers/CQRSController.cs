@@ -19,23 +19,26 @@ namespace ProgramowanieUzytkoweIP12.Controllers
     
         private readonly CommandBus commandBus;
         private readonly QueryBus queryBus;
-        private readonly IElasticClient _elasticClient;
+        //private readonly IElasticClient _elasticClient;
 
-        public CQRSController(CommandBus commandBus, QueryBus queryBus, IElasticClient elasticClient)
+        public Repo _repo { get; }
+        public CQRSController(CommandBus commandBus, QueryBus queryBus, Repo repo)
         {
             this.commandBus = commandBus;
             this.queryBus = queryBus;
-            _elasticClient = elasticClient;
+            _repo = repo;
         }
 
-        public class ElasticModel
-        {
-            public string Currency { get; set; }
-            public string Customer_first_name{ get; set; }
-            public string Customer_full_name{ get; set; }
-            public string Customer_gender{ get; set; }
-            public int Customer_id{ get; set; }
-        }
+        //public class ElasticModel
+        //{
+        //    public string Currency { get; set; }
+        //    public string Customer_first_name{ get; set; }
+        //    public string Customer_full_name{ get; set; }
+        //    public string Customer_gender{ get; set; }
+        //    public int Customer_id{ get; set; }
+        //}
+
+        // zmiana na elastica
 
         [HttpGet("/book/cqrs/es/get")]
         public IEnumerable<BookDto> GetElasticBooks([FromQuery] PaginationDto pagination, [FromQuery] string filter)
@@ -44,7 +47,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
             //IndexResponse res = _elasticClient.IndexDocument<BookDto>(person);
 
 
-            var x = _elasticClient.Search<BookDto>(x => x.Size(10).Skip(0)
+            var x = _repo.elasticClient.Search<BookDto>(x => x.Size(10).Skip(0)
             .Query(q => q
                 .QueryString(qs =>
                     qs.Fields(x => x

@@ -44,8 +44,14 @@ namespace ProgramowanieUzytkoweIP12
 
             services.AddControllers();
 
-            services.AddScoped<IElasticClient>(x =>
-                new ElasticClient(new ElasticConnection(new Uri("http://localhost:9200"))));
+            // wczeœniejsza wersja zale¿noœci elasticsearch
+
+            //services.AddScoped<IElasticClient>(x =>
+            //    new ElasticClient(new ElasticConnection(new Uri("http://localhost:9200"))));
+
+
+            services.AddScoped(x => new Repo("http://localhost:9200"));
+
             var assembly = AppDomain.CurrentDomain.Load("CQRSMediatR");
 
             services.AddMediatR(assembly);
