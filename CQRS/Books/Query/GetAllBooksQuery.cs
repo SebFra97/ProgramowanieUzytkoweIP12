@@ -17,13 +17,12 @@ namespace CQRS.Books.Query
         {
             private ApplicationDbContext context;
             private IBookHelpers _bookHelpers;
-            private readonly IElasticClient _elasticClient;
+            //private readonly IElasticClient _elasticClient;
 
-            public GetAllBooksQueryHandler(ApplicationDbContext context, IBookHelpers bookHelpers, IElasticClient elasticClient)
+            public GetAllBooksQueryHandler(ApplicationDbContext context, IBookHelpers bookHelpers)
             {
                 this.context = context;
                 _bookHelpers = bookHelpers;
-                _elasticClient = elasticClient;
             }
 
             List<BookDto> IQueryHandler<GetAllBooksQuery, List<BookDto>>.Handle(GetAllBooksQuery query)
@@ -53,10 +52,10 @@ namespace CQRS.Books.Query
                    
                 }
 
-                foreach(var result in resultList)
-                {
-                    IndexResponse res = _elasticClient.IndexDocument<BookDto>(result);
-                }
+                //foreach(var result in resultList)
+                //{
+                //    IndexResponse res = _elasticClient.IndexDocument<BookDto>(result);
+                //}
 
                 return resultList;
             }

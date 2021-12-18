@@ -21,6 +21,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         private readonly QueryBus queryBus;
         //private readonly IElasticClient _elasticClient;
 
+
         public Repo _repo { get; }
         public CQRSController(CommandBus commandBus, QueryBus queryBus, Repo repo)
         {

@@ -5,7 +5,7 @@ namespace Model
 {
     public class Repo
     {
-        public ElasticClient elasticClient { get; set; }
+        public IElasticClient elasticClient { get; set; }
 
         public Repo(string url)
         {

@@ -65,6 +65,8 @@ namespace ProgramowanieUzytkoweIP12
             services.AddScoped<IBookHelpers,BookHelpers>();
             services.AddScoped<IAuthorHelpers, AuthorHelpers>();
 
+            services.AddScoped<IMockDataHelper, MockDataHelper>();
+
             services.AddScoped<ICommandHandler<AddBookCommand>, AddBookCommandHandler>();
             services.AddScoped<ICommandHandler<AddRateToBookCommand>, AddRateToBookCommandHandler>();
             services.AddScoped<ICommandHandler<DeleteBookCommand>, DeleteBookCommandHandler>();

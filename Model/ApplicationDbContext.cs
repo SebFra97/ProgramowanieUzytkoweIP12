@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
 
 namespace Model
@@ -26,5 +27,7 @@ namespace Model
 
         //protected override void OnConfiguring(DbContextOptionsBuilder options)
         //    => options.UseSqlite($"Data Source={Environment.CurrentDirectory}\\database.db");
+
+
     }
 }
