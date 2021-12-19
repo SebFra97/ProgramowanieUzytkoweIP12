@@ -1,4 +1,5 @@
 ﻿using Model;
+using Models.DTO;
 using System.Linq;
 
 namespace CQRS.Authors.Command
@@ -10,10 +11,12 @@ namespace CQRS.Authors.Command
         public class DeleteAuthorCommandHandler : ICommandHandler<DeleteAuthorCommand>
         {
             private ApplicationDbContext context;
+            private Repo _repo { get; }
 
-            public DeleteAuthorCommandHandler(ApplicationDbContext context)
+            public DeleteAuthorCommandHandler(ApplicationDbContext context, Repo repo)
             {
                 this.context = context;
+                _repo = repo;
             }
 
             public void Handle(DeleteAuthorCommand request)
@@ -25,6 +28,8 @@ namespace CQRS.Authors.Command
                     context.Authors.Remove(authorToDelete);
                     context.SaveChanges();
                 }
+
+                _repo.elasticClient.Delete<AuthorDto>(request.Id);
             }
         }
     }

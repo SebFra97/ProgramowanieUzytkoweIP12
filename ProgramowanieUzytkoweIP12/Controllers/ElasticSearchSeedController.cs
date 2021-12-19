@@ -108,7 +108,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
 
                 return Task.FromResult(true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Task.FromResult(false);
             }

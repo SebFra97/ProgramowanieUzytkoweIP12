@@ -8,13 +8,15 @@ namespace CQRS.Books.Command
     {
         public BookDto newBook { get; set; }
 
-        public class AddBookCommandHandler : ICommandHandler<AddBookCommand>
+        public class CreateBookCommandHandler : ICommandHandler<AddBookCommand>
         {
             private ApplicationDbContext context;
+            private Repo _repo;
 
-            public AddBookCommandHandler(ApplicationDbContext context)
+            public CreateBookCommandHandler(ApplicationDbContext context, Repo repo)
             {
                 this.context = context;
+                _repo = repo;
             }
 
             public void Handle(AddBookCommand command)
@@ -40,6 +42,8 @@ namespace CQRS.Books.Command
 
                 context.Books.Add(book);
                 context.SaveChanges();
+
+                _repo.elasticClient.Index(book, i => i.Index("books.index"));
             }
         }
     }

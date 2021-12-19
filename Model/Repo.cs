@@ -11,13 +11,5 @@ namespace Model
         {
             elasticClient = new ElasticClient(new ElasticConnection(new Uri(url)));
         }
-
-        //public List<ElasticModel> Get()
-        //{
-        //    return elasticClient.Search<ElasticModel>(x => 
-        //                        x.Query(q => q
-        //                        .Match(q => q
-        //                        .Field)))
-        //}
     }
 }

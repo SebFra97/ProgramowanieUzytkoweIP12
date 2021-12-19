@@ -1,8 +1,6 @@
 ﻿using Helpers;
-using Microsoft.EntityFrameworkCore;
 using Model;
 using Models.DTO;
-using Nest;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,47 +15,21 @@ namespace CQRS.Books.Query
         {
             private ApplicationDbContext context;
             private IBookHelpers _bookHelpers;
-            //private readonly IElasticClient _elasticClient;
+            private Repo _repo { get; }
 
-            public GetAllBooksQueryHandler(ApplicationDbContext context, IBookHelpers bookHelpers)
+            public GetAllBooksQueryHandler(ApplicationDbContext context, IBookHelpers bookHelpers, Repo repo)
             {
                 this.context = context;
                 _bookHelpers = bookHelpers;
+                _repo = repo;
             }
 
             List<BookDto> IQueryHandler<GetAllBooksQuery, List<BookDto>>.Handle(GetAllBooksQuery query)
             {
-                List<BookDto> resultList = new List<BookDto>();
-                List<Book> tempBooks = context.Books.Include(x => x.Authors)
-                                                    .Include(x => x.Rates)
-                                                    .Skip(query.page * query.count)
-                                                    .Take(query.count)
-                                                    .ToList();
+                List<BookDto> listOfBooks = _repo.elasticClient.Search<BookDto>(x => x.Size(query.count).Skip(query.page * query.count)
+                                           .Index("books.index")).Documents.ToList();
 
-                foreach (var book in tempBooks)
-                {
-                    var authors = _bookHelpers.GetAuthorsOfBook(book);
-
-                    resultList.Add(new BookDto
-                    {
-                        Id = book.Id,
-                        Authors = authors.Result,
-                        Title = book.Title,
-                        RatesCount = _bookHelpers.CountBookRates(book),
-                        ReleaseDate = book.ReleaseDate,
-                        AverageRate = _bookHelpers.CountBookAverageRate(book.Rates),
-
-                    });
-
-                   
-                }
-
-                //foreach(var result in resultList)
-                //{
-                //    IndexResponse res = _elasticClient.IndexDocument<BookDto>(result);
-                //}
-
-                return resultList;
+                return listOfBooks;
             }
         }
     }

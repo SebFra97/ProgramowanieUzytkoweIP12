@@ -14,34 +14,21 @@ namespace CQRS.Books.Query
         {
             private ApplicationDbContext context;
             private IBookHelpers _bookHelpers;
+            private Repo _repo { get; }
 
-            public GetBookQueryHandler(ApplicationDbContext context, IBookHelpers bookHelpers)
+            public GetBookQueryHandler(ApplicationDbContext context, IBookHelpers bookHelpers, Repo repo)
             {
                 this.context = context;
                 _bookHelpers = bookHelpers;
+                _repo = repo;
             }
 
             BookDto IQueryHandler<GetBookQuery, BookDto>.Handle(GetBookQuery request)
             {
-                List<AuthorDto> listOfAutors = new List<AuthorDto>();
-                var foundBook = context.Books.Where(x => x.Id == request.id).FirstOrDefault();
+                var listOfBooks = _repo.elasticClient.Search<BookDto>(s => s.Index("books.index")
+                                                                                .Query(q => q.QueryString(qs => qs.Fields(p => p.Field(x => x.Id)).Query(request.id.ToString())))).Documents.First();
 
-                if (foundBook != null)
-                {
-                    var authors = _bookHelpers.GetAuthorsOfBook(foundBook);
-                    var book = new BookDto
-                    {
-                        Id = request.id,
-                        Title = foundBook.Title,
-                        ReleaseDate = foundBook.ReleaseDate,
-                        RatesCount = _bookHelpers.CountBookRates(foundBook),
-                        Authors = authors.Result,
-                        AverageRate = _bookHelpers.CountBookAverageRate(foundBook.Rates)
-                    };
-
-                    return book;
-                }
-                else return null;
+                return listOfBooks;
             }
         }
     }
