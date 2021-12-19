@@ -37,14 +37,17 @@ namespace RepositoryPattern
                 context.SaveChanges();
             }
         }
-        public void CreateNewAuthor(AuthorDto newAuthor)
+        public int CreateNewAuthor(AuthorDto newAuthor)
         {
-            context.Authors.Add(new Author
+            var authorObj = new Author
             {
                 FirstName = newAuthor.FirstName,
                 SecondName = newAuthor.SecondName,
-            });
+            };
+
+            context.Authors.Add(authorObj);
             context.SaveChanges();
+            return authorObj.Id;
         }
         public bool DeleteAuthor(int id)
         {

@@ -37,7 +37,7 @@ namespace RepositoryPattern
                 context.SaveChanges();
             }
         }
-        public void CreateNewBook(BookDto newBook)
+        public int CreateNewBook(BookDto newBook)
         {
             List<Author> bookAuthors = new List<Author>();
 
@@ -50,13 +50,18 @@ namespace RepositoryPattern
                 });
             }
 
-            context.Books.Add(new Book
+            var addedBook = new Book
             {
                 Title = newBook.Title,
                 Authors = bookAuthors,
                 ReleaseDate = newBook.ReleaseDate
-            });
+            };
+
+
+            context.Books.Add(addedBook);
             context.SaveChanges();
+
+            return addedBook.Id;
         }
         public void DeleteBook(int Id)
         {

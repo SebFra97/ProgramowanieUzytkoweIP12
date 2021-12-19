@@ -348,5 +348,10 @@ namespace Helpers
             nameList.Add("Piper");
 
         }
+
+        public int GenerateRandomRate(int end)
+        {
+            return random.Next(end);
+        }
     }
 }

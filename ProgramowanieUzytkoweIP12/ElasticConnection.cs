@@ -8,7 +8,8 @@ namespace ProgramowanieUzytkoweIP12
     {
         public ElasticConnection(Uri uri = null) : base(uri)
         {
-            this.DefaultMappingFor<BookDto>(x => x.IndexName("books_index"));
+            this.DefaultMappingFor<BookDto>(x => x.IndexName("books.index"));
+            this.DefaultMappingFor<AuthorDto>(x => x.IndexName("authors.index"));
         }
     }
 }

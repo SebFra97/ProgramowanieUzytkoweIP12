@@ -7,7 +7,7 @@ namespace RepositoryPattern
     public interface IAuthorRepository
     {
         List<AuthorDto> GetAllAuthors(PaginationDto pagination);
-        void CreateNewAuthor(AuthorDto newAuthor);
+        int CreateNewAuthor(AuthorDto newAuthor);
         bool DeleteAuthor(int id);
         void AddRateToAuthor(int id, int rate);
     }

@@ -8,7 +8,7 @@ namespace RepositoryPattern
     {
         List<BookDto> GetAllBooks(PaginationDto pagination);
         BookDto GetBookById(int Id);
-        void CreateNewBook(BookDto newBook);
+        int CreateNewBook(BookDto newBook);
         void DeleteBook(int Id);
         void AddRateToBook(int Id, int rate);
     }
