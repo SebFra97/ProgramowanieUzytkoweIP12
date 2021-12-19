@@ -9,6 +9,8 @@ namespace CQRS.Authors.Query
     {
         public string phrase { get; set; }
 
+        public bool matchAll { get; set; }
+
         public class SearchAuthorsQueryHandler : IQueryHandler<SearchAuthorsQuery, List<AuthorDto>>
         {
             private Repo _repo { get; }
@@ -21,15 +23,23 @@ namespace CQRS.Authors.Query
             {
 
                 var listOfAuthors = _repo.elasticClient.Search<AuthorDto>(s => s.Index("authors.index")
-                                                                               .Query(q => q.QueryString(qs => qs.Fields(p => p
-                                                                               .Field(x => x.FirstName)
-                                                                               .Field(x => x.SecondName)
+                                                                               .Query(q => q.MultiMatch(qs => qs.Fields(p => p
+                                                                               .Field(x => x.FirstName, 3.0)
+                                                                               .Field(x => x.SecondName, 2.0)
                                                                                //.Field(x => x.Books.SelectMany(x => x.Title))
-                                                                               .Field(x => x.CV))
-                                                                               .Query(query.phrase))))
-                                                                               .Documents.ToList();
+                                                                               .Field(x => x.CV, 1.0))
+                                                                               .Fuzziness(Nest.Fuzziness.Auto) // PKT 3
+                                                                               .Query("*" + query.phrase + "*"))));
 
-                return listOfAuthors;
+                if (query.matchAll)
+                {
+                    return listOfAuthors.Documents.ToList();
+
+                }
+                else
+                {
+                    return new List<AuthorDto> { listOfAuthors.Documents.FirstOrDefault() };
+                }
             }
         }
     }
