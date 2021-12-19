@@ -34,6 +34,7 @@ namespace RepositoryPattern
                     Value = (short)rate
                 });
 
+
                 context.SaveChanges();
             }
         }
@@ -90,5 +91,26 @@ namespace RepositoryPattern
             return resultList;
         }
 
+        public AuthorDto GetAuthor(int id)
+        {
+            List<BookDto> listOfBooks = new List<BookDto>();
+            var foundAuthor = context.Authors.Where(x => x.Id == id).FirstOrDefault();
+
+            if (foundAuthor != null)
+            {
+                var books = _authorHelpers.GetBooksOfAuthor(foundAuthor);
+                return new AuthorDto
+                {
+                    Id = id,
+                    RatesCount = _authorHelpers.CountAuthorRates(foundAuthor),
+                    AverageRate = _authorHelpers.CountAuthorRateAverage(foundAuthor.Rates),
+                    Books = books.Result,
+                    CV = foundAuthor.CV,
+                    FirstName = foundAuthor.FirstName,
+                    SecondName = foundAuthor.SecondName
+                };
+            }
+            else return null;
+        }
     }
 }

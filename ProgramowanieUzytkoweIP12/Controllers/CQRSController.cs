@@ -39,6 +39,13 @@ namespace ProgramowanieUzytkoweIP12.Controllers
             return queryBus.Handle<GetBookQuery, BookDto>(query);
         }
 
+        [HttpGet("/book/cqrs/search")]
+        public List<BookDto> SearchBooks([FromQuery] SearchBooksQuery query)
+        {
+            return queryBus.Handle<SearchBooksQuery, List<BookDto>>(query);
+        }
+
+
         [HttpPost("/book/cqrs/create")]
         public void CreateBook([FromBody] AddBookCommand command)
         {
@@ -64,6 +71,12 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         public List<AuthorDto> GetAuthors([FromQuery] GetAllAuthorsQuery query)
         {
             return queryBus.Handle<GetAllAuthorsQuery, List<AuthorDto>>(query);
+        }
+
+        [HttpGet("/authors/cqrs/search")]
+        public List<AuthorDto> SearchAuthors([FromQuery] SearchAuthorsQuery query)
+        {
+            return queryBus.Handle<SearchAuthorsQuery, List<AuthorDto>>(query);
         }
 
         [HttpPost("/author/cqrs/create")]

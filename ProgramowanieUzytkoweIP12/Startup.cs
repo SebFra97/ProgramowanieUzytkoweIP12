@@ -21,11 +21,13 @@ using static CQRS.Authors.Command.AddRateToAuthorCommand;
 using static CQRS.Authors.Command.CreateAuthorCommand;
 using static CQRS.Authors.Command.DeleteAuthorCommand;
 using static CQRS.Authors.Query.GetAllAuthorsQuery;
+using static CQRS.Authors.Query.SearchAuthorsQuery;
 using static CQRS.Books.Command.AddBookCommand;
 using static CQRS.Books.Command.AddRateToBookCommand;
 using static CQRS.Books.Command.DeleteBookCommand;
 using static CQRS.Books.Query.GetAllBooksQuery;
 using static CQRS.Books.Query.GetBookQuery;
+using static CQRS.Books.Query.SearchBooksQuery;
 
 namespace ProgramowanieUzytkoweIP12
 {
@@ -77,6 +79,8 @@ namespace ProgramowanieUzytkoweIP12
             services.AddScoped<ICommandHandler<CreateAuthorCommand>, CreateNewAuthorCommandHandler>();
             services.AddScoped<ICommandHandler<DeleteAuthorCommand>, DeleteAuthorCommandHandler>();
             services.AddScoped<IQueryHandler<GetAllAuthorsQuery, List<AuthorDto>>, GetAllAuthorsQueryHandler>();
+            services.AddScoped<IQueryHandler<SearchAuthorsQuery, List<AuthorDto>>, SearchAuthorsQueryHandler>();
+            services.AddScoped<IQueryHandler<SearchBooksQuery, List<BookDto>>, SearchBooksQueryHandler>();
 
             //services.AddDbContext<ApplicationDbContext>(options =>
             // options.UseNpgsql("Server=localhost;Port=5432;Database=PU_Database;User Id=postgres;Password=sebfra1;"));

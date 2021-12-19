@@ -18,14 +18,18 @@ namespace ProgramowanieUzytkoweIP12.Controllers
         private IAuthorRepository _authorRepository { get; set; }
         private ApplicationDbContext dbContext { get; set; }
         private IMockDataHelper mockDataHelper { get; set; }
+        private IAuthorHelpers authorHelpers { get; set; }
+        private IBookHelpers bookHelpers { get; set; }
 
-        public ElasticSearchSeedController(Repo repo, IBookRepository bookRepository, IAuthorRepository authorRepository, ApplicationDbContext dbContext, IMockDataHelper mockDataHelper)
+        public ElasticSearchSeedController(Repo repo, IBookRepository bookRepository, IAuthorRepository authorRepository, ApplicationDbContext dbContext, IMockDataHelper mockDataHelper, IAuthorHelpers authorHelpers, IBookHelpers bookHelpers)
         {
             _repo = repo;
             _bookRepository = bookRepository;
             _authorRepository = authorRepository;
             this.dbContext = dbContext;
             this.mockDataHelper = mockDataHelper;
+            this.authorHelpers = authorHelpers;
+            this.bookHelpers = bookHelpers;
         }
 
         [HttpGet("/seed/data")]
@@ -38,7 +42,7 @@ namespace ProgramowanieUzytkoweIP12.Controllers
                 if (_repo.elasticClient.Indices.Exists("authors.index").Exists)
                 {
                     _repo.elasticClient.Indices.Delete("authors.index");                 
-                }
+                };
 
                 if (_repo.elasticClient.Indices.Exists("books.index").Exists)
                 {
@@ -77,8 +81,11 @@ namespace ProgramowanieUzytkoweIP12.Controllers
                 foreach (var author in mockAuthors)
                 {
                     var addedId = _authorRepository.CreateNewAuthor(author);
-                    _authorRepository.AddRateToAuthor(addedId, mockDataHelper.GenerateRandomRate(10));
+                    var rate = mockDataHelper.GenerateRandomRate(10);
+                    _authorRepository.AddRateToAuthor(addedId,rate);
                     author.Id = addedId;
+                    author.RatesCount = 1;
+                    author.AverageRate = rate.ToString();               
                     _repo.elasticClient.Index(author, i => i.Index("authors.index"));
                 }
 
@@ -101,8 +108,11 @@ namespace ProgramowanieUzytkoweIP12.Controllers
                 foreach (var book in mockBooks)
                 {
                     var addedId = _bookRepository.CreateNewBook(book);
-                    _bookRepository.AddRateToBook(addedId, mockDataHelper.GenerateRandomRate(10));
+                    var rate = mockDataHelper.GenerateRandomRate(10);
+                    _bookRepository.AddRateToBook(addedId, rate);
                     book.Id = addedId;
+                    book.RatesCount = 1;
+                    book.AverageRate = rate.ToString();
                     _repo.elasticClient.Index(book, i => i.Index("books.index"));
                 }
 
