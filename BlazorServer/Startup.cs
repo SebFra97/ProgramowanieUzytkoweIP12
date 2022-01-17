@@ -8,6 +8,7 @@ using Model;
 using System;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Blazored.Modal;
 
 namespace BlazorServer
 {
@@ -34,7 +35,11 @@ namespace BlazorServer
             var assembly = AppDomain.CurrentDomain.Load("CQRSMediatR");
             services.AddMediatR(assembly);
 
+
+
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite($"Data Source={Environment.CurrentDirectory}\\database.db"));
+
+            services.AddBlazoredModal();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

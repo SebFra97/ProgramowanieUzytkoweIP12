@@ -1,9 +1,11 @@
 ﻿@using Models.DTO;
 @using CQRSMediatR.Authors.Query
+@using CQRSMediatR.Authors.Command 
 
 @page "/authors"
 
 <h1>List of Authors</h1>
+<button class="btn btn-success" data-toggle="button" aria-pressed="false" @*@onclick="() => CreateArticle()"*@>Add</button>
 <div class="mb-2 w-100">
     <table class="table w-100">
         <thead>
@@ -29,7 +31,7 @@
                         <td>@string.Join(", ", author.Books.Select(x => x.Title).ToArray());</td>
                         <td>
                             <button type="button" class="btn btn-secondary oi oi-cog"></button>
-                            <button type="button" class="btn btn-secondary oi oi-trash"></button>
+                            <button type="button" class="btn btn-secondary oi oi-trash" @onclick="() => ConfirmDelete(author)"></button>
                         </td>
                     </tr>
                 }
@@ -43,12 +45,62 @@
     private List<AuthorDto> listOfAuthors;
     private PaginationDto paginationDto = new PaginationDto (0,10);
 
+    [CascadingParameter]
+    public IModalService Modal { get; set; }
+
 
     protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    protected async Task LoadDataAsync()
     {
         listOfAuthors = new List<AuthorDto>();
         listOfAuthors = await _mediator.Send(new GetAllAuthorsQuery() { page = 0, count = 10 });
         StateHasChanged();
-
     }
+
+    #region DELETE MODAL
+
+    public async Task ConfirmDelete(AuthorDto author)
+    {
+        var modalParams = new ModalParameters();
+
+        string message = String.Format("Jesteś pewny że chcesz usunąć - {0} {1}?", author.FirstName, author.SecondName);
+
+        modalParams.Add("Message", message);
+
+        var modalOptions = new ModalOptions()
+        {
+            HideCloseButton = true,
+            DisableBackgroundCancel = true,
+            HideHeader = false,
+            Animation = ModalAnimation.FadeInOut(1),
+        };
+
+        var modalShow = Modal.Show<ConfirmModal>("Usuń autora", modalParams, modalOptions);
+
+        var result = await modalShow.Result;
+
+        if (!result.Cancelled && result.Data == "OK")
+        {
+            await AcceptDelete_Closed(author);
+        }
+    }
+
+    public async Task AcceptDelete_Closed(AuthorDto author)
+    {
+        var result = await _mediator.Send(new DeleteAuthorCommand()
+        {
+            Id = author.Id
+        });
+        if (result)
+        {
+            await LoadDataAsync();
+        }
+    }
+
+#endregion
+
 }

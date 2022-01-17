@@ -1,0 +1,116 @@
+﻿@using CQRSMediatR.Books.Command
+
+<div class="simple-form">
+    <div class="form-group">
+        <label for="newTitleArticle">Tytuł</label>
+        <input type="text" class="form-control" id="bookTitle" @bind-value="@_InputBookTitle">
+    </div>
+    <div class="form-group">
+        <label for="newTitleArticle">Data wydania</label>
+        <input type="text" class="form-control" id="bookDate" @bind-value="@_InputBookDate">
+    </div>
+    <div class="form-group">
+        <label for="newTitleArticle">Opis</label>
+        <input type="text" class="form-control" id="bookDescription" @bind-value="@_InputBookDescription">
+    </div>
+    <div class="form-group">
+        <label for="newTitleArticle">Imie autora</label>
+        <input type="text" class="form-control" id="bookAuthorName" @bind-value="@_InputBookAuthorName">
+    </div>
+    <div class="form-group">
+        <label for="newTitleArticle">Nazwisko autora</label>
+        <input type="text" class="form-control" id="bookAuthorSurname" @bind-value="@_InputBookAuthorSurname">
+    </div>
+
+    <div class="form-group">
+        <label for="newTitleArticle">Book Rate</label>
+        <input type="text" class="form-control" id="bookRate" @bind-value="@_InputBookRate">
+    </div>
+
+
+    <button type="submit" class="btn btn-success" @onclick="ConfirmChanges">Submit</button>
+
+</div>
+
+
+@code {
+
+    [CascadingParameter]
+    BlazoredModalInstance ModalInstance { get; set; }
+
+    [Parameter]
+    public BookDto editedBook { get; set; }
+
+    [Parameter]
+    public string Message { get; set; }
+
+    private string _InputBookTitle { get; set; } = "";
+    private string _InputBookDescription { get; set; } = "";
+    private string _InputBookDate { get; set; } = "";
+    private string _InputBookAuthorName { get; set; } = "";
+    private string _InputBookAuthorSurname { get; set; } = "";
+    private string _InputBookRate { get; set; } = "";
+
+    protected async override void OnInitialized()
+    {
+        if(editedBook != null)
+        {
+            _InputBookTitle = editedBook.Title;
+            _InputBookDescription = editedBook.Description;
+            _InputBookDate = editedBook.ReleaseDate.ToString();
+            _InputBookAuthorName = editedBook.Authors.FirstOrDefault().FirstName;
+            _InputBookAuthorSurname = editedBook.Authors.FirstOrDefault().SecondName;
+            // _InputBookRate = editedBook.
+        }
+    }
+
+
+    public void Ok()
+    {
+        ModalInstance.CloseAsync(ModalResult.Ok("OK"));
+    }
+
+    public void Cancel()
+    {
+        ModalInstance.CancelAsync();
+    }
+
+    private async Task ConfirmChanges()
+    {
+        if (editedBook != null)
+        {
+            //await ModifyBook();
+        }
+        else
+        {
+            await CreateBook();
+        }
+    }
+
+    private async Task CreateBook()
+    {
+        List<AuthorVM> authors = new List<AuthorVM>();
+        authors.Add(new AuthorVM { FirstName = _InputBookAuthorName, SecondName = _InputBookAuthorSurname, CV = " " });
+
+        BookDto newBook = new BookDto()
+        {
+            Title = _InputBookTitle,
+            Description = _InputBookDescription,
+            RatesCount = 1,
+            AverageRate = "2",
+            ReleaseDate = DateTime.Now,
+            Authors = authors
+        };
+
+
+        var result = await _mediator.Send(new CreateBookCommand()
+        {
+            newBook = newBook
+        });
+
+        if(result != null)
+        {
+            await ModalInstance.CloseAsync(ModalResult.Ok("OK"));
+        }
+    }
+}

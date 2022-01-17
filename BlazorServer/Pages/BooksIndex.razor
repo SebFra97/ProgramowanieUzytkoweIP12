@@ -1,10 +1,10 @@
-﻿@using Models.DTO;
-@using CQRSMediatR.Books.Query
-@using System
+﻿@using CQRSMediatR.Books.Query
+@using CQRSMediatR.Books.Command
 
 @page "/books"
 
 <h1>List of Books</h1>
+<button class="btn btn-success" data-toggle="button" aria-pressed="false" @onclick="() => CreateBook()">Dodaj</button>
 <div class="mb-2 w-100">
     <table class="table w-100">
         <thead>
@@ -17,7 +17,7 @@
                 <th>Akcje</th>
             </tr>
         </thead>
-        @if(listOfBooks.Count > 0)
+        @if (listOfBooks.Count > 0)
         {
             <tbody>
                 @foreach (var book in listOfBooks)
@@ -31,8 +31,8 @@
                             @string.Join(", ", book.Authors.Select(x => x.FirstName + " " + x.SecondName).ToArray());
                         </td>
                         <td>
-                            <button type="button" class="btn btn-secondary oi oi-cog"></button>
-                            <button type="button" class="btn btn-secondary oi oi-trash"></button>
+                            <button type="button" class="btn btn-secondary oi oi-cog" @onclick="() => ModifyBook(book)"></button>
+                            <button type="button" class="btn btn-secondary oi oi-trash" @onclick="() => ConfirmDelete(book)"></button>
                         </td>
                     </tr>
                 }
@@ -44,14 +44,112 @@
 
 @code {
     private List<BookDto> listOfBooks;
-    private PaginationDto paginationDto = new PaginationDto (0,10);
+    private PaginationDto paginationDto = new PaginationDto(0, 10);
+
+    [CascadingParameter]
+    public IModalService Modal { get; set; }
 
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadDataAsync();
+    }
+
+    protected async Task LoadDataAsync()
+    {
         listOfBooks = new List<BookDto>();
         listOfBooks = await _mediator.Send(new GetAllBooksQuery() { page = 0, count = 10 });
         StateHasChanged();
-
     }
+
+
+    #region DELETE MODAL
+
+    public async Task ConfirmDelete(BookDto book)
+    {
+        var modalParams = new ModalParameters();
+
+        string message = String.Format("Jesteś pewny że chcesz usunąć - {0} ?", book.Title);
+
+        modalParams.Add("Message", message);
+
+        var modalOptions = new ModalOptions()
+        {
+            HideCloseButton = true,
+            DisableBackgroundCancel = true,
+            HideHeader = false,
+            Animation = ModalAnimation.FadeInOut(1),
+        };
+
+        var modalShow = Modal.Show<ConfirmModal>("Usuń książkę", modalParams, modalOptions);
+
+        var result = await modalShow.Result;
+
+        if (!result.Cancelled && result.Data == "OK")
+        {
+            await AcceptDelete_Closed(book);
+        }
+    }
+
+    public async Task AcceptDelete_Closed(BookDto book)
+    {
+        var result = await _mediator.Send(new DeleteBookCommand()
+        {
+            id = book.Id
+        });
+        if (result)
+        {
+            await LoadDataAsync();
+        }
+    }
+    #endregion
+
+    #region ADD MODAL
+    public async Task CreateBook()
+    {
+        var modalParams = new ModalParameters();
+        var modalOptions = new ModalOptions()
+        {
+            HideCloseButton = true,
+            DisableBackgroundCancel = true,
+            HideHeader = false,
+            Animation = ModalAnimation.FadeInOut(1),
+        };
+
+        var modalShow = Modal.Show<ManageBookModal>("Utwórz książkę", modalParams, modalOptions);
+        var result = await modalShow.Result;
+
+        if (!result.Cancelled)
+        {
+            await LoadDataAsync();
+        }
+    }
+    #endregion
+
+    #region MODIFY MODAL
+    public async Task ModifyBook(BookDto book)
+    {
+        var modalParams = new ModalParameters();
+
+        modalParams.Add("editedBook", book);
+
+        var modalOptions = new ModalOptions()
+        {
+            HideCloseButton = false,
+            DisableBackgroundCancel = true,
+            HideHeader = false,
+            Animation = ModalAnimation.FadeInOut(1),
+        };
+
+        var modalShow = Modal.Show<ManageBookModal>("Edytuj książkę", modalParams, modalOptions);
+        var result = await modalShow.Result;
+
+        if (!result.Cancelled)
+        {
+            await LoadDataAsync();
+        }
+    }
+    #endregion
+
 }
+

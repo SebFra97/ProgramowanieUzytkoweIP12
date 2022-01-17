@@ -1,0 +1,31 @@
+﻿<div class="w-100">
+    <div class="blazored-modal-content">
+        <p>@Message</p>
+        <div class="modal-footer">
+            <div class="d-inline text-right">
+                <button type="button" class="btn btn-primary" data-toggle="button" @onclick="Ok">Tak</button>
+                <button type="button" class="btn btn-secondary" data-toggle="button" @onclick="Cancel">Nie</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    [CascadingParameter]
+    BlazoredModalInstance ModalInstance { get; set; }
+
+    [Parameter]
+    public string Message { get; set; }
+
+    public void Ok()
+    {
+        ModalInstance.CloseAsync(ModalResult.Ok("OK"));
+    }
+
+    public void Cancel()
+    {
+        ModalInstance.CancelAsync();
+    }
+}
