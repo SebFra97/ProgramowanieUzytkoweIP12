@@ -27,7 +27,10 @@
                         <td>@author.AverageRate</td>
                         <td>@author.RatesCount</td>
                         <td>@string.Join(", ", author.Books.Select(x => x.Title).ToArray());</td>
-                        <td>Akcja 1</td>
+                        <td>
+                            <button type="button" class="btn btn-secondary oi oi-cog"></button>
+                            <button type="button" class="btn btn-secondary oi oi-trash"></button>
+                        </td>
                     </tr>
                 }
             </tbody>

@@ -30,7 +30,10 @@
                         <td>
                             @string.Join(", ", book.Authors.Select(x => x.FirstName + " " + x.SecondName).ToArray());
                         </td>
-                        <td>Akcja 1</td>
+                        <td>
+                            <button type="button" class="btn btn-secondary oi oi-cog"></button>
+                            <button type="button" class="btn btn-secondary oi oi-trash"></button>
+                        </td>
                     </tr>
                 }
             </tbody>
