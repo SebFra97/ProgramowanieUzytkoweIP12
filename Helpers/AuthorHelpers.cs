@@ -18,8 +18,8 @@ namespace Helpers
 
         public async Task<List<BookVM>> GetBooksOfAuthor(Author inputAuthor)
         {
-            var books = await context.Books
-                                              .Where(x => x.Authors.Contains(inputAuthor))
+            var books = await context.Books.Include(x => x.Authors)
+                                              .Where(x => x.Authors.Any(x => x.SecondName == inputAuthor.SecondName))
                                               .Select(book => new BookVM
                                               {
                                                   Id = book.Id,

@@ -1,15 +1,13 @@
-using BlazorServer.Data;
+using Helpers;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Model;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorServer
 {
@@ -28,8 +26,15 @@ namespace BlazorServer
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddScoped(x => new Repo("http://localhost:9200"));
-            services.AddSingleton<WeatherForecastService>();
+            //services.AddScoped(x => new Repo("http://localhost:9200"));
+
+            services.AddScoped<IBookHelpers, BookHelpers>();
+            services.AddScoped<IAuthorHelpers, AuthorHelpers>();
+
+            var assembly = AppDomain.CurrentDomain.Load("CQRSMediatR");
+            services.AddMediatR(assembly);
+
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite($"Data Source={Environment.CurrentDirectory}\\database.db"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

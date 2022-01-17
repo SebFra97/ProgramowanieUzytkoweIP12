@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="9.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CQRSMediatR\CQRSMediatR.csproj" />
     <ProjectReference Include="..\Model\Model.csproj" />
   </ItemGroup>
 

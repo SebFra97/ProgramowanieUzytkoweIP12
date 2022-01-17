@@ -1,0 +1,51 @@
+﻿@using Models.DTO;
+@using CQRSMediatR.Authors.Query
+
+@page "/authors"
+
+<h1>List of Authors</h1>
+<div class="mb-2 w-100">
+    <table class="table w-100">
+        <thead>
+            <tr>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>Średnia ocen</th>
+                <th>Ilość ocen</th>
+                <th>Książki</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        @if (listOfAuthors.Count > 0)
+        {
+            <tbody>
+                @foreach (var author in listOfAuthors)
+                {
+                    <tr>
+                        <td>@author.FirstName</td>
+                        <td>@author.SecondName</td>
+                        <td>@author.AverageRate</td>
+                        <td>@author.RatesCount</td>
+                        <td>@string.Join(", ", author.Books.Select(x => x.Title).ToArray());</td>
+                        <td>Akcja 1</td>
+                    </tr>
+                }
+            </tbody>
+        }
+    </table>
+</div>
+
+
+@code {
+    private List<AuthorDto> listOfAuthors;
+    private PaginationDto paginationDto = new PaginationDto (0,10);
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        listOfAuthors = new List<AuthorDto>();
+        listOfAuthors = await _mediator.Send(new GetAllAuthorsQuery() { page = 0, count = 10 });
+        StateHasChanged();
+
+    }
+}
