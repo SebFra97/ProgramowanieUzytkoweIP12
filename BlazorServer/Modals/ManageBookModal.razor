@@ -22,12 +22,6 @@
         <input type="text" class="form-control" id="bookAuthorSurname" @bind-value="@_InputBookAuthorSurname">
     </div>
 
-    <div class="form-group">
-        <label for="newTitleArticle">Book Rate</label>
-        <input type="text" class="form-control" id="bookRate" @bind-value="@_InputBookRate">
-    </div>
-
-
     <button type="submit" class="btn btn-success" @onclick="ConfirmChanges">Submit</button>
 
 </div>
@@ -60,7 +54,7 @@
             _InputBookDate = editedBook.ReleaseDate.ToString();
             _InputBookAuthorName = editedBook.Authors.FirstOrDefault().FirstName;
             _InputBookAuthorSurname = editedBook.Authors.FirstOrDefault().SecondName;
-            // _InputBookRate = editedBook.
+            _InputBookRate = editedBook.AverageRate;
         }
     }
 
@@ -79,7 +73,7 @@
     {
         if (editedBook != null)
         {
-            //await ModifyBook();
+            await ModifyBook();
         }
         else
         {
@@ -109,6 +103,23 @@
         });
 
         if(result != null)
+        {
+            await ModalInstance.CloseAsync(ModalResult.Ok("OK"));
+        }
+    }
+
+    private async Task ModifyBook()
+    {
+        var result = await _mediator.Send(new EditBookCommand()
+        {
+            BookId = editedBook.Id,
+            Description = _InputBookDescription,
+            Title = _InputBookTitle,
+            ReleaseDate = DateTime.Parse(_InputBookDate),
+
+        }) ;
+
+        if (result == true)
         {
             await ModalInstance.CloseAsync(ModalResult.Ok("OK"));
         }

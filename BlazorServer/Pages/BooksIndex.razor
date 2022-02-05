@@ -5,6 +5,7 @@
 
 <h1>List of Books</h1>
 <button class="btn btn-success" data-toggle="button" aria-pressed="false" @onclick="() => CreateBook()">Dodaj</button>
+<br />
 <div class="mb-2 w-100">
     <table class="table w-100">
         <thead>
@@ -32,6 +33,7 @@
                         </td>
                         <td>
                             <button type="button" class="btn btn-secondary oi oi-cog" @onclick="() => ModifyBook(book)"></button>
+                            <button type="button" class="btn btn-secondary oi oi-bookmark" @onclick="() => AddRate(book)"></button>
                             <button type="button" class="btn btn-secondary oi oi-trash" @onclick="() => ConfirmDelete(book)"></button>
                         </td>
                     </tr>
@@ -149,6 +151,33 @@
             await LoadDataAsync();
         }
     }
+    #endregion
+
+    #region ADD RATE
+    public async Task AddRate(BookDto book)
+    {
+        var modalParams = new ModalParameters();
+
+        modalParams.Add("inputId", book.Id);
+        modalParams.Add("type", "book");
+
+        var modalOptions = new ModalOptions()
+        {
+            HideCloseButton = false,
+            DisableBackgroundCancel = true,
+            HideHeader = false,
+            Animation = ModalAnimation.FadeInOut(1),
+        };
+
+        var modalShow = Modal.Show<AddRateModal>("Dodaj ocenę", modalParams, modalOptions);
+        var result = await modalShow.Result;
+
+        if (!result.Cancelled)
+        {
+            await LoadDataAsync();
+        }
+    }
+
     #endregion
 
 }

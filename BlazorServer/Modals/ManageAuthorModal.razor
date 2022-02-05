@@ -1,0 +1,117 @@
+﻿@using CQRSMediatR.Authors.Command
+
+<div class="simple-form">
+    <div class="form-group">
+        <label for="newTitleArticle">Imię</label>
+        <input type="text" class="form-control" id="bookTitle" @bind-value="@_InputAuthorName">
+    </div>
+    <div class="form-group">
+        <label for="newTitleArticle">Nazwisko</label>
+        <input type="text" class="form-control" id="bookDate" @bind-value="@_InputSurName">
+    </div>
+    <div class="form-group">
+        <label for="newTitleArticle">CV</label>
+        <input type="text" class="form-control" id="bookDescription" @bind-value="@_InputCV">
+    </div>
+    <div class="form-group">
+        <label for="newTitleArticle">Tytuł książki</label>
+        <input type="text" class="form-control" id="bookAuthorName" @bind-value="@_InputBookTitle">
+    </div>
+
+    <button type="submit" class="btn btn-success" @onclick="ConfirmChanges">Submit</button>
+
+</div>
+
+
+@code {
+
+    [CascadingParameter]
+    BlazoredModalInstance ModalInstance { get; set; }
+
+    [Parameter]
+    public AuthorDto editedAuthor { get; set; }
+
+    [Parameter]
+    public string Message { get; set; }
+
+    private string _InputAuthorName { get; set; } = "";
+    private string _InputSurName { get; set; } = "";
+    private string _InputCV { get; set; } = "";
+
+    private string _InputBookTitle { get; set; } = "";
+
+    protected async override void OnInitialized()
+    {
+        if(editedAuthor != null)
+        {
+            _InputAuthorName = editedAuthor.FirstName;
+            _InputSurName = editedAuthor.SecondName;
+            _InputCV = editedAuthor.CV;
+            _InputBookTitle = editedAuthor.Books.FirstOrDefault().Title;
+        }
+    }
+
+    public void Ok()
+    {
+        ModalInstance.CloseAsync(ModalResult.Ok("OK"));
+    }
+
+    public void Cancel()
+    {
+        ModalInstance.CancelAsync();
+    }
+
+    private async Task ConfirmChanges()
+    {
+        if (editedAuthor != null)
+        {
+            await ModifyAuthor();
+        }
+        else
+        {
+            await CreateAuthor();
+        }
+    }
+
+    private async Task CreateAuthor()
+    {
+        List<BookVM> books = new List<BookVM>();
+        books.Add(new BookVM { Title = _InputBookTitle});
+
+        AuthorDto newAuthor = new AuthorDto()
+        {
+            FirstName = _InputAuthorName,
+            SecondName = _InputSurName,
+            CV = _InputCV,
+            Books = books,
+        };
+
+
+        var result = await _mediator.Send(new CreateAuthorCommand()
+        {
+            newAuthor = newAuthor,
+        });
+
+        if(result != null)
+        {
+            await ModalInstance.CloseAsync(ModalResult.Ok("OK"));
+        }
+    }
+
+    private async Task ModifyAuthor()
+    {
+        var result = await _mediator.Send(new EditAuthorCommand()
+        {
+            AuthorId = editedAuthor.Id,
+            Name = _InputAuthorName,
+            SurName = _InputSurName,
+            CV = _InputCV
+
+        }) ;
+
+        if (result == true)
+        {
+            await ModalInstance.CloseAsync(ModalResult.Ok("OK"));
+        }
+    }
+}

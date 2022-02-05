@@ -5,7 +5,8 @@
 @page "/authors"
 
 <h1>List of Authors</h1>
-<button class="btn btn-success" data-toggle="button" aria-pressed="false" @*@onclick="() => CreateArticle()"*@>Add</button>
+<button class="btn btn-success" data-toggle="button" aria-pressed="false" @onclick="() => CreateAuthor()">Dodaj</button>
+<br />
 <div class="mb-2 w-100">
     <table class="table w-100">
         <thead>
@@ -30,7 +31,8 @@
                         <td>@author.RatesCount</td>
                         <td>@string.Join(", ", author.Books.Select(x => x.Title).ToArray());</td>
                         <td>
-                            <button type="button" class="btn btn-secondary oi oi-cog"></button>
+                            <button type="button" class="btn btn-secondary oi oi-cog" @onclick="() => ModifyAuthor(author)"></button>
+                            <button type="button" class="btn btn-secondary oi oi-bookmark" @onclick="() => AddRate(author)"></button>
                             <button type="button" class="btn btn-secondary oi oi-trash" @onclick="() => ConfirmDelete(author)"></button>
                         </td>
                     </tr>
@@ -100,7 +102,74 @@
             await LoadDataAsync();
         }
     }
+    #endregion
 
-#endregion
+    public async Task CreateAuthor()
+    {
+        var modalParams = new ModalParameters();
+        var modalOptions = new ModalOptions()
+        {
+            HideCloseButton = true,
+            DisableBackgroundCancel = true,
+            HideHeader = false,
+            Animation = ModalAnimation.FadeInOut(1),
+        };
+
+        var modalShow = Modal.Show<ManageAuthorModal>("Utwórz autora", modalParams, modalOptions);
+        var result = await modalShow.Result;
+
+        if (!result.Cancelled)
+        {
+            await LoadDataAsync();
+        }
+    }
+
+    public async Task ModifyAuthor(AuthorDto author)
+    {
+        var modalParams = new ModalParameters();
+
+        modalParams.Add("editedAuthor", author);
+
+        var modalOptions = new ModalOptions()
+        {
+            HideCloseButton = false,
+            DisableBackgroundCancel = true,
+            HideHeader = false,
+            Animation = ModalAnimation.FadeInOut(1),
+        };
+
+        var modalShow = Modal.Show<ManageAuthorModal>("Edytuj autora", modalParams, modalOptions);
+        var result = await modalShow.Result;
+
+        if (!result.Cancelled)
+        {
+            await LoadDataAsync();
+        }
+    }
+
+    public async Task AddRate(AuthorDto author)
+    {
+        var modalParams = new ModalParameters();
+
+        modalParams.Add("inputId", author.Id);
+        modalParams.Add("type", "author");
+
+        var modalOptions = new ModalOptions()
+        {
+            HideCloseButton = false,
+            DisableBackgroundCancel = true,
+            HideHeader = false,
+            Animation = ModalAnimation.FadeInOut(1),
+        };
+
+        var modalShow = Modal.Show<AddRateModal>("Dodaj ocenę", modalParams, modalOptions);
+        var result = await modalShow.Result;
+
+        if (!result.Cancelled)
+        {
+            await LoadDataAsync();
+        }
+    }
+
 
 }

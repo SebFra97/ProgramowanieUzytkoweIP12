@@ -1,0 +1,73 @@
+﻿@using CQRSMediatR.Authors.Command
+@using CQRSMediatR.Books.Command
+
+<div class="simple-form">
+    <div class="form-group">
+        <label for="rate">Ocena</label>
+        <input type="text" class="form-control" id="rate" @bind-value="@_InputRate">
+    </div>
+
+    <button type="submit" class="btn btn-success" @onclick="Confirm">Submit</button>
+
+</div>
+
+
+@code {
+
+    [CascadingParameter]
+    BlazoredModalInstance ModalInstance { get; set; }
+
+    [Parameter]
+    public int inputId { get; set; }
+
+    [Parameter]
+    public string type { get; set; }
+
+    [Parameter]
+    public string Message { get; set; }
+
+    private string _InputRate { get; set; } = "";
+
+    protected async override void OnInitialized() { }
+
+    public void Ok()
+    {
+        ModalInstance.CloseAsync(ModalResult.Ok("OK"));
+    }
+
+    public void Cancel()
+    {
+        ModalInstance.CancelAsync();
+    }
+
+    private async Task Confirm()
+    {
+        if(type == "author")
+        {
+            var result = await _mediator.Send(new AddRateToAuthorCommand()
+            {
+                id = inputId,
+                rate = Int32.Parse(_InputRate)
+            });
+
+            if (result)
+            {
+                await ModalInstance.CloseAsync(ModalResult.Ok("OK"));
+            }
+        }
+
+        if(type == "book")
+        {
+            var result = await _mediator.Send(new AddRateToBookCommand()
+            {
+                id = inputId,
+                rate = Int32.Parse(_InputRate)
+            });
+
+            if (result)
+            {
+                await ModalInstance.CloseAsync(ModalResult.Ok("OK"));
+            }
+        }
+    }
+}
