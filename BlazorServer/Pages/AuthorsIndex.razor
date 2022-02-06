@@ -1,10 +1,12 @@
 ﻿@using Models.DTO;
 @using CQRSMediatR.Authors.Query
-@using CQRSMediatR.Authors.Command 
+@using CQRSMediatR.Authors.Command
 
 @page "/authors"
 
-<h1>List of Authors</h1>
+<h1>Lista Autorów</h1>
+<input type="text" class="form-control" @oninput="@((ChangeEventArgs _e) => Search(_e.Value.ToString()))" id="search" placeholder="Wyszukaj ..." />
+<br />
 <button class="btn btn-success" data-toggle="button" aria-pressed="false" @onclick="() => CreateAuthor()">Dodaj</button>
 <br />
 <div class="mb-2 w-100">
@@ -48,7 +50,8 @@
 
 @code {
     private List<AuthorDto> listOfAuthors;
-    private PaginationDto paginationDto = new PaginationDto (0,100);
+    private List<AuthorDto> tempListOfAuthors;
+    private PaginationDto paginationDto = new PaginationDto(0, 100);
 
     [CascadingParameter]
     public IModalService Modal { get; set; }
@@ -194,5 +197,32 @@
         else if (pageCounter > 0) disablePageDown = false;
     }
 
+    private async void Search(string? searchTerm)
+    {
+        if (!String.IsNullOrEmpty(searchTerm))
+        {
+            pageCounter = 0;
+            tempListOfAuthors = await _mediator.Send(new GetAllAuthorsQuery() { page = 0, count = 100 });
+            var query = tempListOfAuthors.Where(x => x.FirstName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
+                                    || x.SecondName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
+                                    || x.CV.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
+                                    || x.Books.Any(a => a.Title.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase))).ToList();
+
+            if (query.Count > 0)
+            {
+                tempListOfAuthors = query;
+                pageCounter = 0;
+            }
+            else
+            {
+                pageCounter = 0;
+                tempListOfAuthors = await _mediator.Send(new GetAllAuthorsQuery() { page = pageCounter, count = 5 });
+            }
+        }
+        else
+        {
+            tempListOfAuthors = await _mediator.Send(new GetAllAuthorsQuery() { page = pageCounter, count = 5 });
+        }
+    }
 
 }

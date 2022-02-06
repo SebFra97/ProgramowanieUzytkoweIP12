@@ -4,7 +4,9 @@
 
 @page "/books"
 
-<h1>List of Books</h1>
+<h1>Lista Książek</h1>
+<input type="text" class="form-control" @oninput="@((ChangeEventArgs _e) => Search(_e.Value.ToString()))" id="search" placeholder="Wyszukaj ..." />
+<br />
 <button class="btn btn-success" data-toggle="button" aria-pressed="false" @onclick="() => CreateBook()">Dodaj</button>
 <br />
 <div class="mb-2 w-100">
@@ -50,6 +52,7 @@
 
 @code {
     private List<BookDto> listOfBooks;
+    private List<BookDto> tempListOfBooks;
     private PaginationDto paginationDto = new PaginationDto(0, 10);
 
     [CascadingParameter]
@@ -57,7 +60,6 @@
 
     private int pageCounter { get; set; } = 0;
     private bool disablePageDown { get; set; } = true;
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -70,7 +72,6 @@
         listOfBooks = await _mediator.Send(new GetAllBooksQuery() { page = pageCounter, count = 5 });
         StateHasChanged();
     }
-
 
     #region DELETE MODAL
 
@@ -203,6 +204,32 @@
 
         if (pageCounter <= 0) disablePageDown = true;
         else if (pageCounter > 0) disablePageDown = false;
+    }
+
+    private async void Search(string? searchTerm)
+    {
+        if (!String.IsNullOrEmpty(searchTerm))
+        {
+            pageCounter = 0;
+            tempListOfBooks = await _mediator.Send(new GetAllBooksQuery() { page = 0, count = 100 });
+            var query = tempListOfBooks.Where(x => x.Title.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
+                                    || x.Description.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
+                                    || x.Authors.Any(a => a.FirstName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase))
+                                    || x.Authors.Any(a => a.SecondName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase))).ToList();
+
+            if(query.Count > 0)
+            {
+                listOfBooks = query;
+                pageCounter = 0;
+            } else
+            {
+                pageCounter = 0;
+                listOfBooks = await _mediator.Send(new GetAllBooksQuery() { page = pageCounter, count = 5 });
+            }
+        } else
+        {
+            listOfBooks = await _mediator.Send(new GetAllBooksQuery() { page = pageCounter, count = 5 });
+        }
     }
 
 }
