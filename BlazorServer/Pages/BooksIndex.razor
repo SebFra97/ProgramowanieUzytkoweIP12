@@ -42,6 +42,9 @@
             </tbody>
         }
     </table>
+
+    <button class="btn btn-danger" data-toggle="button" aria-pressed="false" disabled ="@disablePageDown"  @onclick="() => PageDown()">Wcześniejsza strona</button>
+    <button class="btn btn-success" data-toggle="button" aria-pressed="false" @onclick="() => PageUp()" >Następna strona</button>
 </div>
 
 
@@ -52,6 +55,9 @@
     [CascadingParameter]
     public IModalService Modal { get; set; }
 
+    private int pageCounter { get; set; } = 0;
+    private bool disablePageDown { get; set; } = true;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,7 +67,7 @@
     protected async Task LoadDataAsync()
     {
         listOfBooks = new List<BookDto>();
-        listOfBooks = await _mediator.Send(new GetAllBooksQuery() { page = 0, count = 10 });
+        listOfBooks = await _mediator.Send(new GetAllBooksQuery() { page = pageCounter, count = 5 });
         StateHasChanged();
     }
 
@@ -180,6 +186,24 @@
     }
 
     #endregion
+
+    public async Task PageUp()
+    {
+        pageCounter++;
+        listOfBooks = await _mediator.Send(new GetAllBooksQuery() { page = pageCounter, count = 5 });
+
+        if (pageCounter > 0) disablePageDown = false;
+        else if (pageCounter <= 0) disablePageDown = true;
+    }
+
+    public async Task PageDown()
+    {
+        pageCounter--;
+        listOfBooks = await _mediator.Send(new GetAllBooksQuery() { page = pageCounter, count = 5 });
+
+        if (pageCounter <= 0) disablePageDown = true;
+        else if (pageCounter > 0) disablePageDown = false;
+    }
 
 }
 
