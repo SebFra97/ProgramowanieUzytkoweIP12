@@ -1,22 +1,31 @@
 ﻿@using CQRSMediatR.Authors.Command
+@using CQRSMediatR.Books.Query
 
 <div class="simple-form">
     <div class="form-group">
-        <label for="newTitleArticle">Imię</label>
-        <input type="text" class="form-control" id="bookTitle" @bind-value="@_InputAuthorName">
+        <label for="Name">Imię</label>
+        <input type="text" class="form-control" id="authorName" @bind-value="@_InputAuthorName">
     </div>
     <div class="form-group">
-        <label for="newTitleArticle">Nazwisko</label>
-        <input type="text" class="form-control" id="bookDate" @bind-value="@_InputSurName">
+        <label for="Surname">Nazwisko</label>
+        <input type="text" class="form-control" id="authorSurname" @bind-value="@_InputSurName">
     </div>
     <div class="form-group">
-        <label for="newTitleArticle">CV</label>
-        <input type="text" class="form-control" id="bookDescription" @bind-value="@_InputCV">
+        <label for="CV">CV</label>
+        <input type="text" class="form-control" id="authorCV" @bind-value="@_InputCV">
     </div>
+    
     <div class="form-group">
-        <label for="newTitleArticle">Tytuł książki</label>
-        <input type="text" class="form-control" id="bookAuthorName" @bind-value="@_InputBookTitle">
+        <label for="selectCategory">Książka</label>
+        <select class="form-control" id="selectCategory" @bind="_InputBookId">
+            <option value="@_InputBookId">@_InputBookTitle</option>
+            @foreach (var template in BookList)
+            {
+                <option value=@template.Id>@template.Title</option>
+            }
+        </select>
     </div>
+
 
     <button type="submit" class="btn btn-success" @onclick="ConfirmChanges">Submit</button>
 
@@ -38,7 +47,10 @@
     private string _InputSurName { get; set; } = "";
     private string _InputCV { get; set; } = "";
 
+    private int _InputBookId;
     private string _InputBookTitle { get; set; } = "";
+
+    private List<BookDto> BookList = new List<BookDto>();
 
     protected async override void OnInitialized()
     {
@@ -48,7 +60,14 @@
             _InputSurName = editedAuthor.SecondName;
             _InputCV = editedAuthor.CV;
             _InputBookTitle = editedAuthor.Books.FirstOrDefault().Title;
+            _InputBookId = editedAuthor.Books.FirstOrDefault().Id;
+
         }
+        BookList = await _mediator.Send(new GetAllBooksQuery()
+        {
+            page = 0,
+            count = 100,
+        });
     }
 
     public void Ok()
@@ -75,8 +94,14 @@
 
     private async Task CreateAuthor()
     {
+        var findBook = _mediator.Send(new GetBookQuery()
+        {
+            id = _InputBookId
+        });
+
         List<BookVM> books = new List<BookVM>();
-        books.Add(new BookVM { Title = _InputBookTitle});
+
+        books.Add(new BookVM { Id = _InputBookId, Title = _InputBookTitle});
 
         AuthorDto newAuthor = new AuthorDto()
         {
@@ -105,7 +130,8 @@
             AuthorId = editedAuthor.Id,
             Name = _InputAuthorName,
             SurName = _InputSurName,
-            CV = _InputCV
+            CV = _InputCV,
+            BookId = _InputBookId
 
         }) ;
 
