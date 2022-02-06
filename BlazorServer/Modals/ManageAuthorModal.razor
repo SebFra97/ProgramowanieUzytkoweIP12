@@ -1,4 +1,5 @@
 ﻿@using CQRSMediatR.Authors.Command
+@using CQRSMediatR.Authors.Query
 @using CQRSMediatR.Books.Query
 
 <div class="simple-form">
@@ -140,4 +141,27 @@
             await ModalInstance.CloseAsync(ModalResult.Ok("OK"));
         }
     }
+
+    private async Task<IEnumerable<AuthorDto>> SearchName(string searchText)
+    {
+        List<AuthorDto> authors = await _mediator.Send(new GetAllAuthorsQuery()
+        {
+            page = 0,
+            count = 100
+        });
+
+        return await Task.FromResult(authors.Where(x => x.FirstName.ToLower().Contains(searchText.ToLower())).Distinct().ToList());
+    }
+
+    private async Task<IEnumerable<AuthorDto>> SearchSurName(string searchText)
+    {
+        List<AuthorDto> authors = await _mediator.Send(new GetAllAuthorsQuery()
+        {
+            page = 0,
+            count = 100
+        });
+
+        return await Task.FromResult(authors.Where(x => x.SecondName.ToLower().Contains(searchText.ToLower())).Distinct().ToList());
+    }
+
 }
