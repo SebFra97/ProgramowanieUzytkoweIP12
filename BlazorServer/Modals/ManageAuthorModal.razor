@@ -5,163 +5,194 @@
 <div class="simple-form">
     <div class="form-group">
         <label for="Name">Imię</label>
-        <input type="text" class="form-control" id="authorName" @bind-value="@_InputAuthorName">
+        @*<input type="text" class="form-control" id="authorName" @bind-value="@_InputAuthorName">*@
+        <BlazoredTypeahead SearchMethod="@SearchName"
+                           @bind-Value="@_InputAuthorName"
+                           Debounce="500">
+            <SelectedTemplate>
+                @context
+            </SelectedTemplate>
+            <ResultTemplate>
+                @context
+            </ResultTemplate>
+            <NotFoundTemplate>
+                Brak wyników.
+            </NotFoundTemplate>
+        </BlazoredTypeahead>
     </div>
     <div class="form-group">
         <label for="Surname">Nazwisko</label>
-        <input type="text" class="form-control" id="authorSurname" @bind-value="@_InputSurName">
-    </div>
-    <div class="form-group">
-        <label for="CV">CV</label>
-        <input type="text" class="form-control" id="authorCV" @bind-value="@_InputCV">
-    </div>
-    
-    <div class="form-group">
-        <label for="selectCategory">Książka</label>
-        <select class="form-control" id="selectCategory" @bind="_InputBookId">
-            <option value="@_InputBookId">@_InputBookTitle</option>
-            @foreach (var template in BookList)
+        @*<input type="text" class="form-control" id="authorSurname" @bind-value="@_InputSurName">*@
+        <BlazoredTypeahead SearchMethod="@SearchSurName"
+                                   @bind-Value="@_InputSurName"
+                                   Debounce="500">
+                    <SelectedTemplate>
+                        @context
+                    </SelectedTemplate>
+                    <ResultTemplate>
+                        @context
+                    </ResultTemplate>
+                    <NotFoundTemplate>
+                        Brak wyników.
+                    </NotFoundTemplate>
+                </BlazoredTypeahead>
+            </div>
+            <div class="form-group">
+                <label for="CV">CV</label>
+                <input type="text" class="form-control" id="authorCV" @bind-value="@_InputCV">
+            </div>
+
+            <div class="form-group">
+                <label for="selectCategory">Książka</label>
+                <select class="form-control" id="selectCategory" @bind="_InputBookId">
+                    <option value="@_InputBookId">@_InputBookTitle</option>
+                    @foreach (var template in BookList)
+                    {
+                        <option value=@template.Id>@template.Title</option>
+                    }
+                </select>
+            </div>
+
+
+            <button type="submit" class="btn btn-success" @onclick="ConfirmChanges">Submit</button>
+
+        </div>
+
+
+        @code {
+
+            [CascadingParameter]
+            BlazoredModalInstance ModalInstance { get; set; }
+
+            [Parameter]
+            public AuthorDto editedAuthor { get; set; }
+
+            [Parameter]
+            public string Message { get; set; }
+
+            private string _InputAuthorName { get; set; } = "";
+            private string _InputSurName { get; set; } = "";
+            private string _InputCV { get; set; } = "";
+
+            private int _InputBookId;
+            private string _InputBookTitle { get; set; } = "";
+
+            private List<BookDto> BookList = new List<BookDto>();
+
+            protected async override void OnInitialized()
             {
-                <option value=@template.Id>@template.Title</option>
+                if(editedAuthor != null)
+                {
+                    _InputAuthorName = editedAuthor.FirstName;
+                    _InputSurName = editedAuthor.SecondName;
+                    _InputCV = editedAuthor.CV;
+                    _InputBookTitle = editedAuthor.Books.FirstOrDefault().Title;
+                    _InputBookId = editedAuthor.Books.FirstOrDefault().Id;
+                }
+                BookList = await _mediator.Send(new GetAllBooksQuery()
+                {
+                    page = 0,
+                    count = 100,
+                });
             }
-        </select>
-    </div>
+
+            public void Ok()
+            {
+                ModalInstance.CloseAsync(ModalResult.Ok("OK"));
+            }
+
+            public void Cancel()
+            {
+                ModalInstance.CancelAsync();
+            }
+
+            private async Task ConfirmChanges()
+            {
+                if (editedAuthor != null)
+                {
+                    await ModifyAuthor();
+                }
+                else
+                {
+                    await CreateAuthor();
+                }
+            }
+
+            private async Task CreateAuthor()
+            {
+                var findBook = _mediator.Send(new GetBookQuery()
+                {
+                    id = _InputBookId
+                });
+
+                List<BookVM> books = new List<BookVM>();
+
+                books.Add(new BookVM { Id = _InputBookId, Title = _InputBookTitle});
+
+                AuthorDto newAuthor = new AuthorDto()
+                {
+                    FirstName = _InputAuthorName,
+                    SecondName = _InputSurName,
+                    CV = _InputCV,
+                    Books = books,
+                };
 
 
-    <button type="submit" class="btn btn-success" @onclick="ConfirmChanges">Submit</button>
+                var result = await _mediator.Send(new CreateAuthorCommand()
+                {
+                    newAuthor = newAuthor,
+                });
 
-</div>
+                if(result != null)
+                {
+                    await ModalInstance.CloseAsync(ModalResult.Ok("OK"));
+                }
+            }
 
+            private async Task ModifyAuthor()
+            {
+                var result = await _mediator.Send(new EditAuthorCommand()
+                {
+                    AuthorId = editedAuthor.Id,
+                    Name = _InputAuthorName,
+                    SurName = _InputSurName,
+                    CV = _InputCV,
+                    BookId = _InputBookId
 
-@code {
+                }) ;
 
-    [CascadingParameter]
-    BlazoredModalInstance ModalInstance { get; set; }
+                if (result == true)
+                {
+                    await ModalInstance.CloseAsync(ModalResult.Ok("OK"));
+                }
+            }
 
-    [Parameter]
-    public AuthorDto editedAuthor { get; set; }
+            private async Task<IEnumerable<string>> SearchName(string searchText)
+            {
+                List<AuthorDto> authors = await _mediator.Send(new GetAllAuthorsQuery()
+                {
+                    page = 0,
+                    count = 100
+                });
 
-    [Parameter]
-    public string Message { get; set; }
+                List<string> foundedNames = new List<string>();
+                foundedNames = authors.Where(x => x.FirstName != null && x.FirstName.ToLower().Contains(searchText.ToLower())).Select(x => x.FirstName).Distinct().ToList();
 
-    private string _InputAuthorName { get; set; } = "";
-    private string _InputSurName { get; set; } = "";
-    private string _InputCV { get; set; } = "";
+                return await Task.FromResult(foundedNames);
+            }
 
-    private int _InputBookId;
-    private string _InputBookTitle { get; set; } = "";
+            private async Task<IEnumerable<string>> SearchSurName(string searchText)
+            {
+                List<AuthorDto> authors = await _mediator.Send(new GetAllAuthorsQuery()
+                {
+                    page = 0,
+                    count = 100
+                });
 
-    private List<BookDto> BookList = new List<BookDto>();
+                List<string> foundedSurNames = new List<string>();
+                foundedSurNames = authors.Where(x => x.SecondName != null && x.SecondName.ToLower().Contains(searchText.ToLower())).Select(x => x.SecondName).Distinct().ToList();
 
-    protected async override void OnInitialized()
-    {
-        if(editedAuthor != null)
-        {
-            _InputAuthorName = editedAuthor.FirstName;
-            _InputSurName = editedAuthor.SecondName;
-            _InputCV = editedAuthor.CV;
-            _InputBookTitle = editedAuthor.Books.FirstOrDefault().Title;
-            _InputBookId = editedAuthor.Books.FirstOrDefault().Id;
+                return await Task.FromResult(foundedSurNames);
+            }
 
         }
-        BookList = await _mediator.Send(new GetAllBooksQuery()
-        {
-            page = 0,
-            count = 100,
-        });
-    }
-
-    public void Ok()
-    {
-        ModalInstance.CloseAsync(ModalResult.Ok("OK"));
-    }
-
-    public void Cancel()
-    {
-        ModalInstance.CancelAsync();
-    }
-
-    private async Task ConfirmChanges()
-    {
-        if (editedAuthor != null)
-        {
-            await ModifyAuthor();
-        }
-        else
-        {
-            await CreateAuthor();
-        }
-    }
-
-    private async Task CreateAuthor()
-    {
-        var findBook = _mediator.Send(new GetBookQuery()
-        {
-            id = _InputBookId
-        });
-
-        List<BookVM> books = new List<BookVM>();
-
-        books.Add(new BookVM { Id = _InputBookId, Title = _InputBookTitle});
-
-        AuthorDto newAuthor = new AuthorDto()
-        {
-            FirstName = _InputAuthorName,
-            SecondName = _InputSurName,
-            CV = _InputCV,
-            Books = books,
-        };
-
-
-        var result = await _mediator.Send(new CreateAuthorCommand()
-        {
-            newAuthor = newAuthor,
-        });
-
-        if(result != null)
-        {
-            await ModalInstance.CloseAsync(ModalResult.Ok("OK"));
-        }
-    }
-
-    private async Task ModifyAuthor()
-    {
-        var result = await _mediator.Send(new EditAuthorCommand()
-        {
-            AuthorId = editedAuthor.Id,
-            Name = _InputAuthorName,
-            SurName = _InputSurName,
-            CV = _InputCV,
-            BookId = _InputBookId
-
-        }) ;
-
-        if (result == true)
-        {
-            await ModalInstance.CloseAsync(ModalResult.Ok("OK"));
-        }
-    }
-
-    private async Task<IEnumerable<AuthorDto>> SearchName(string searchText)
-    {
-        List<AuthorDto> authors = await _mediator.Send(new GetAllAuthorsQuery()
-        {
-            page = 0,
-            count = 100
-        });
-
-        return await Task.FromResult(authors.Where(x => x.FirstName.ToLower().Contains(searchText.ToLower())).Distinct().ToList());
-    }
-
-    private async Task<IEnumerable<AuthorDto>> SearchSurName(string searchText)
-    {
-        List<AuthorDto> authors = await _mediator.Send(new GetAllAuthorsQuery()
-        {
-            page = 0,
-            count = 100
-        });
-
-        return await Task.FromResult(authors.Where(x => x.SecondName.ToLower().Contains(searchText.ToLower())).Distinct().ToList());
-    }
-
-}

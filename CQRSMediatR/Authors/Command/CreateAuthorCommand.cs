@@ -25,6 +25,8 @@ namespace CQRSMediatR.Authors.Command
                 {
                     FirstName = request.newAuthor.FirstName,
                     SecondName = request.newAuthor.SecondName,
+                    CV = request.newAuthor.CV,
+                    
                 };
 
                 var result = context.Authors.Add(newAuthor);
